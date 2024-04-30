@@ -222,7 +222,7 @@ const MobileNav = ({ onOpen, logout, isUser, ...rest }) => {
                 <HStack>
                   <Avatar
                     size={"sm"}
-                    name='Dan Abrahmov' src='https://bit.ly/dan-abramov'
+                    name='Dan Abrahmov' src={`${process.env.REACT_APP_API_HOST}/${isUser.profileImage}` ||'https://bit.ly/dan-abramov'}
                   />
                   <VStack
                     display={{ base: "none", md: "flex" }}
