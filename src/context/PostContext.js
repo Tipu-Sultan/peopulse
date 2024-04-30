@@ -287,7 +287,7 @@ export const PostProvider = ({ children }) => {
   }, [posts]);
 
   const handleSharePost = (postId,media,type)=>{
-    navigator.clipboard.writeText(API_HOST+''+media);
+    navigator.clipboard.writeText(media);
     navigate('/chat')
     SetIsSendAction(true);
   }
