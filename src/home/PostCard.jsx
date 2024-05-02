@@ -74,7 +74,7 @@ const PostCard = () => {
                     key={post._id}
                     size="md"
                     name={post?.username[1]}
-                    src={`${post.profileImage}`}
+                    src={`${post?.profileImage}`}
                     position="absolute"
                     top="50%"
                     left="50%"
@@ -85,7 +85,7 @@ const PostCard = () => {
                 <VStack align="start">
                   <Text fontWeight="bold">{post?.username}</Text>
                   <Text color="gray.500">
-                    {calculateTimeDifference(post.createdAt)}
+                    {calculateTimeDifference(post?.createdAt)}
                   </Text>
                 </VStack>
               </HStack>

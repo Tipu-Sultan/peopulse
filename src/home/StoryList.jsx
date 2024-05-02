@@ -106,8 +106,8 @@ const StoryList = () => {
   const filteredPosts = filteredStories.filter(story => {
     return (
       story?.username === isUser?.username ||
-      isUser.following.some(follow => follow.followingUsername === story?.username && follow.logginUsername === isUser?.username && follow.action === "Following") ||
-      isUser.followers.some(follower => follower.followersUsername === story?.username && follower.logginUsername === isUser?.username && follower.action === "Following")
+      isUser?.following.some(follow => follow?.followingUsername === story?.username && follow?.logginUsername === isUser?.username && follow?.action === "Following") ||
+      isUser?.followers.some(follower => follower?.followersUsername === story?.username && follower?.logginUsername === isUser?.username && follower?.action === "Following")
     );
   });
 
