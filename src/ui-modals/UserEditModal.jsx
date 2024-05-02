@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const EditProfileModal = ({ isOpen, onClose, user }) => {
   const API_HOST = process.env.REACT_APP_API_HOST;
@@ -54,19 +55,25 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
       formData.append('email', editedUser.email);
       formData.append('bio', editedUser.bio);
 
-      // Send a POST request to your server
+      // Get the bearer token from wherever you store it
+      const token = localStorage.getItem('token'); // Example: Fetch token from localStorage
+
+      // Send a POST request to your server with authorization header
       const response = await axios.put(`${API_HOST}/api/auth/saveprofile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data', 
+          'Authorization': `Bearer ${token}`, // Include bearer token in the header
         },
       });
 
       console.log('Server response:', response.data);
+      toast.success('edit successfully')
       onClose();
     } catch (error) {
       console.error('Error saving profile:', error);
     }
   };
+
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md">

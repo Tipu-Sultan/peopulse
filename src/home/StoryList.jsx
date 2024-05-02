@@ -78,7 +78,7 @@ const Story = ({ username, image, isAddStory, stories }) => {
             position="absolute"
             zIndex="1"
           />
-          <Avatar src={`${API_HOST}/${image}`} position="absolute" />
+          <Avatar src={`${image}`} position="absolute" />
         </Circle>
         <StoryPreview loggedInUser={isUser} API_HOST={API_HOST} stories={selectedUserStories} isOpen={isPreviewOpen} onClose={onPreviewClose} />
         <Text mt="2">{username}</Text>

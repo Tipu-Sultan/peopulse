@@ -23,7 +23,6 @@ import { usePost } from "../context/PostContext";
 
 
 const PostCard = () => {
-  const API_HOST = process.env.REACT_APP_API_HOST;
   const { posts, handleLike, deleteAuthPost, user, RenderContent, handleSharePost } = usePost();
   const [commentModalOpen, setCommentModalOpen] = useState(null)
 
@@ -61,7 +60,7 @@ const PostCard = () => {
                   borderColor={'#F56565'}
                   borderWidth="2px"
                   cursor="pointer"
-                  position="relative" 
+                  position="relative"
                 >
                   <Circle
                     size="60px"
@@ -75,11 +74,11 @@ const PostCard = () => {
                     key={post._id}
                     size="md"
                     name={post?.username[1]}
-                    src={`${API_HOST}/${post.profileImage}`}
+                    src={`${post.profileImage}`}
                     position="absolute"
                     top="50%"
                     left="50%"
-                    transform="translate(-50%, -50%)" 
+                    transform="translate(-50%, -50%)"
                   />
                 </Circle>
 
@@ -97,7 +96,7 @@ const PostCard = () => {
                   <MenuList>
                     {user._id === post.user && <MenuItem onClick={() => deleteAuthPost(post._id)}>Delete post</MenuItem>}
                     <MenuItem>report</MenuItem>
-                    <MenuItem>edit</MenuItem>
+                    {user._id === post.user && <MenuItem>Edit</MenuItem>}
                   </MenuList>
                 </Menu>
                 <CloseButton title="Not intrested" />

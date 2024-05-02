@@ -46,17 +46,19 @@ const Profile = () => {
         <Image
           h={'200px'}
           w={'full'}
-          src={`${API_HOST}/${loadedUser.coverImage}`}
+          src={`${loadedUser.coverImage}`}
           objectFit="cover"
           alt="Cover Image"
         />
         <Flex justify={'center'} mt={-12}>
           <Avatar
             size={'xl'}
-            src={`${API_HOST}/${loadedUser.profileImage}`}
+            src={`${loadedUser.profileImage}`}
             css={{
               border: '4px solid white',
             }}
+
+            alt="Avatar Image"
           />
         </Flex>
 
