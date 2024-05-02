@@ -115,7 +115,7 @@ const ChatApp = () => {
               onClick={() => selectedUser?.username !== user.username && handleUserClick(user)}
             >
               <Flex align="center" position="relative">
-                <Avatar size="md" src={API_HOST + '/' + user.profileImage} mr={2} />
+                <Avatar size="md" src={user.profileImage} mr={2} />
                 <Box position="absolute" top="2" right="0">
                   {user.isLogged ? (
                     <Badge bg="green.600" borderRadius="full" boxSize="8px" />
@@ -160,7 +160,7 @@ const ChatApp = () => {
           borderColor="gray.300"
         >
           <Flex align="center">
-            <Avatar size="md" src={selectedUser && API_HOST + '/' + selectedUser.profileImage} mr="2" />
+            <Avatar size="md" src={selectedUser && selectedUser.profileImage} mr="2" />
             <Box>
               <Text fontWeight="bold">
                 {selectedUser && selectedUser.firstname + ' ' + selectedUser.lastname}

@@ -97,14 +97,14 @@ export default function Follow() {
             <Image
               h={"120px"}
               w={"full"}
-              src={`${API_HOST}/${user.coverImage}`}
+              src={`${user.coverImage}`}
               objectFit="cover"
               alt={user.coverImage}
             />
             <Flex justify={"center"} mt={-12}>
               <Avatar
                 size={"xl"}
-                src={`${API_HOST}/${user.profileImage}`}
+                src={`${user.profileImage}`}
                 css={{
                   border: "2px solid white",
                 }}
