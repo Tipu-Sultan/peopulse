@@ -38,15 +38,15 @@ export const PostProvider = ({ children }) => {
     try {
       setLoading(true);
       const formData = new FormData();
-  
+
       if (postText.trim() !== "") {
         formData.append("content", postText);
       }
-  
+
       if (selectedFile) {
         formData.append("file", selectedFile);
       }
-  
+
       formData.append("user", user._id);
       formData.append("username", user.username);
       formData.append("profileImage", user.profileImage);
@@ -54,7 +54,7 @@ export const PostProvider = ({ children }) => {
         "contentType",
         selectedFile ? selectedFile.type : "text/plain"
       );
-  
+
       const response = await axios.post(
         `${API_HOST}/api/post/addpost`,
         formData,
@@ -65,14 +65,14 @@ export const PostProvider = ({ children }) => {
           },
         }
       );
-  
+
       if (response.status === 201) {
         setPostText("");
         setSelectedFile(null);
         setLoading(false);
         handleCloseModal();
         const newPostData = response.data.newPost;
-        socket.emit('addPost',newPostData)
+        socket.emit('addPost', newPostData)
       } else {
         setLoading(false);
         console.error("Failed to create post");
@@ -82,7 +82,7 @@ export const PostProvider = ({ children }) => {
       console.error("Error:", error);
     }
   };
-  
+
 
   const handleLike = async (postId) => {
     try {
@@ -112,7 +112,7 @@ export const PostProvider = ({ children }) => {
         `${API_HOST}/api/post/add-comment/${postId}`,
         {
           userID: user._id,
-          profileImage:user.profileImage,
+          profileImage: user.profileImage,
           username: user.username,
           text: commentText,
         },
@@ -127,7 +127,7 @@ export const PostProvider = ({ children }) => {
       if (response.status === 200) {
         const postIndex = posts.findIndex((post) => post._id === postId);
         const commentData = response.data.commentPost.comments
-        socket.emit('addComment',postIndex,commentData);
+        socket.emit('addComment', postIndex, commentData);
         setCommentText(' ')
       } else {
         console.error('Failed to add comment');
@@ -161,7 +161,7 @@ export const PostProvider = ({ children }) => {
           }
           return post;
         });
-        socket.emit('deleteComment',updatedPosts);
+        socket.emit('deleteComment', updatedPosts);
         setCommentText('');
       } else {
         console.error('Failed to delete comment');
@@ -182,7 +182,7 @@ export const PostProvider = ({ children }) => {
 
       if (response.status === 200) {
         const updatedPosts = posts.filter((post) => post._id !== postId);
-        socket.emit('deletePost',updatedPosts);
+        socket.emit('deletePost', updatedPosts);
         toast.success(response.data.message);
       }
     } catch (error) {
@@ -241,6 +241,17 @@ export const PostProvider = ({ children }) => {
           </AspectRatio>
         </>
       );
+    } else if (contentType === "audio") { // Added audio content type
+      return (
+        <>
+          {content && <Text py={2}>{content}</Text>}
+          <audio
+            src={`${media}`}
+            title="Post Audio"
+            controls
+          ></audio>
+        </>
+      );
     } else if (contentType === "text") {
       return <Text mb="4">{content}</Text>;
     } else {
@@ -249,13 +260,14 @@ export const PostProvider = ({ children }) => {
     }
   };
 
+
   useEffect(() => {
-    socket.on('addComment', (postIndex,commentData) => {
+    socket.on('addComment', (postIndex, commentData) => {
       if (postIndex !== -1) {
-          const updatedPosts = [...posts];
-          updatedPosts[postIndex].comments = commentData;
-          setPosts(updatedPosts)
-        }
+        const updatedPosts = [...posts];
+        updatedPosts[postIndex].comments = commentData;
+        setPosts(updatedPosts)
+      }
     });
 
     socket.on('deleteComment', (updatedPosts) => {
@@ -274,9 +286,9 @@ export const PostProvider = ({ children }) => {
       setPosts(updatedPosts);
     });
     socket.on('addPost', (newPostData) => {
-      setPosts((prevPosts) => [...prevPosts,newPostData]);
+      setPosts((prevPosts) => [...prevPosts, newPostData]);
     });
-  
+
     return () => {
       socket.off('addPost');
       socket.off('deletePost');
@@ -286,7 +298,7 @@ export const PostProvider = ({ children }) => {
     };
   }, [posts]);
 
-  const handleSharePost = (postId,media,type)=>{
+  const handleSharePost = (postId, media, type) => {
     navigator.clipboard.writeText(media);
     navigate('/chat')
     SetIsSendAction(true);
