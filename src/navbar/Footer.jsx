@@ -33,6 +33,12 @@ const SocialButton = ({ children, label, href }) => {
     </chakra.button>
   );
 };
+// Get the current date
+const currentDate = new Date();
+// Get the current year
+const currentYear = currentDate.getFullYear();
+// Calculate the previous year
+const previousYear = currentYear - 1;
 
 export default function Footer() {
   return (
@@ -50,7 +56,7 @@ export default function Footer() {
         align={{ base: 'center', md: 'center' }}
 
       >
-        <Text>© 2022 Chakra Templates. All rights reserved</Text>
+        <Text>© {currentYear - previousYear} Tipu Sultan. All rights reserved</Text>
         <Stack direction={'row'} spacing={6}>
           <SocialButton label={'Twitter'} href={'#'}>
             <FaTwitter />
