@@ -56,7 +56,7 @@ export default function Footer() {
         align={{ base: 'center', md: 'center' }}
 
       >
-        <Text>© {currentYear - previousYear} Tipu Sultan. All rights reserved</Text>
+        <Text>© {previousYear +'-'+ currentYear} Tipu Sultan. All rights reserved</Text>
         <Stack direction={'row'} spacing={6}>
           <SocialButton label={'Twitter'} href={'#'}>
             <FaTwitter />
