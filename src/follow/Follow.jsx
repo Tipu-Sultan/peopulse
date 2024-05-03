@@ -99,7 +99,7 @@ export default function Follow() {
               w={"full"}
               src={`${user.coverImage}`}
               objectFit="cover"
-              alt={user.coverImage}
+              alt={'user coverImage'}
             />
             <Flex justify={"center"} mt={-12}>
               <Avatar
