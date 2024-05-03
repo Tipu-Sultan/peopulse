@@ -21,17 +21,22 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+
 const EditProfileModal = ({ isOpen, onClose, user }) => {
   const API_HOST = process.env.REACT_APP_API_HOST;
-  const { isUser, } = useAuth();
-  const { username, firstname, lastname, email, bio } = isUser;
+  const { isUser } = useAuth();
+  const { username, firstname, lastname, email, bio, profileImage, coverImage } = isUser;
   const [editedUser, setEditedUser] = useState({
     username: username,
     firstname: firstname,
     lastname: lastname,
     email: email,
     bio: bio,
+    profileImage: null, 
+    coverImage: null, 
   });
+  const [profileFileSelected, setProfileFileSelected] = useState(false);
+  const [coverFileSelected, setCoverFileSelected] = useState(false);
 
   const handleChange = (field, value) => {
     setEditedUser((prev) => ({ ...prev, [field]: value }));
@@ -40,13 +45,28 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
   const handleFileChange = (field, event) => {
     const file = event.target.files[0];
     setEditedUser((prev) => ({ ...prev, [field]: file }));
+    if (field === 'profileImage') {
+      setProfileFileSelected(true);
+    } else if (field === 'coverImage') {
+      setCoverFileSelected(true);
+    }
   };
 
   const handleSave = async () => {
     try {
       const formData = new FormData();
-      formData.append('avatar', editedUser.avatar); 
-      formData.append('coverImage', editedUser.coverImage); 
+
+      if (editedUser.profileImage) {
+        formData.append('avatar', editedUser.profileImage);
+      } else {
+        formData.append('avatar', profileImage); // If no new file selected, send the previous URL
+      }
+
+      if (editedUser.coverImage) {
+        formData.append('coverImage', editedUser.coverImage);
+      } else {
+        formData.append('coverImage', coverImage); // If no new file selected, send the previous URL
+      }
 
       // Append other fields to formData if needed
       formData.append('username', editedUser.username);
@@ -61,19 +81,18 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
       // Send a POST request to your server with authorization header
       const response = await axios.put(`${API_HOST}/api/auth/saveprofile`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', 
-          'Authorization': `Bearer ${token}`, // Include bearer token in the header
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`, // Include bearer token in the header
         },
       });
 
       console.log('Server response:', response.data);
-      toast.success('edit successfully')
+      toast.success('Edit successful');
       onClose();
     } catch (error) {
       console.error('Error saving profile:', error);
     }
   };
-
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md">
@@ -86,12 +105,12 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
             <HStack spacing={8} mb={4}>
               <Box>
                 <Text>Profile Picture</Text>
-                <Avatar src={editedUser.avatar} size="xl" cursor="pointer" onClick={() => document.getElementById('avatarInput').click()} />
-                <input type="file" id="avatarInput" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleFileChange('avatar', e)} />
+                <Avatar src={profileFileSelected ? URL.createObjectURL(editedUser.profileImage) : profileImage} size="xl" cursor="pointer" onClick={() => document.getElementById('avatarInput').click()} />
+                <input type="file" id="avatarInput" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleFileChange('profileImage', e)} />
               </Box>
               <Box>
                 <Text>Banner Image</Text>
-                <Image src={editedUser.coverImage} alt="Banner Image" maxH="100px" cursor="pointer" onClick={() => document.getElementById('bannerInput').click()} />
+                <Image src={coverFileSelected ? URL.createObjectURL(editedUser.coverImage) : coverImage} alt="Banner Image" maxH="100px" cursor="pointer" onClick={() => document.getElementById('bannerInput').click()} />
                 <input type="file" id="bannerInput" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleFileChange('coverImage', e)} />
               </Box>
             </HStack>
@@ -111,5 +130,7 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
     </Modal>
   );
 };
+
+
 
 export default EditProfileModal;
