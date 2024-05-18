@@ -1,32 +1,22 @@
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Box,
-  Flex,
-  Input,
-  IconButton,
-  Text,
-  Divider,
-  Avatar,
-  List,
-  ListItem,
-  Button,
-  Image,
-  VStack,
-  Badge,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Icon,
+  Box, Flex, List, ListItem, Avatar, Badge, VStack,
+  Text, Menu, MenuButton, MenuList, MenuItem, IconButton,
+  Input, Button, Image, Divider, Icon,
+  useColorMode,
+  useColorModeValue
 } from '@chakra-ui/react';
-import { FaEllipsisH, FaFileDownload, FaPaperclip, FaTrash } from 'react-icons/fa';
-import { useChats } from '../context/ChatsContext';
-import { useEffect, useRef } from 'react';
-import { calculateTimeDifference } from '../services/timeConvert';
+import { FaEllipsisH, FaTrash, FaFileDownload, FaPaperclip, FaBars, FaTimes } from 'react-icons/fa';
 import { CloseIcon } from '@chakra-ui/icons';
-
+import { useChats } from '../context/ChatsContext'; // Assuming you have a custom hook for chat logic
+import { calculateTimeDifference } from '../services/timeConvert';
 const ChatApp = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isUserListOpen, setIsUserListOpen] = useState(false);
+
   const API_HOST = process.env.REACT_APP_API_HOST;
   const chatboxRef = useRef(null);
+
   const {
     isTyping, checkTyping, typingUser,
     dowloadMessageFile, fileInputRef,
@@ -37,10 +27,18 @@ const ChatApp = () => {
     handleUserClick, messages, allmessages,
     getFollowedUser, handleSendMessage,
     handleDeleteMessage
-  } = useChats()
+  } = useChats();
+
   useEffect(() => {
-    getFollowedUser()
-  }, [])
+    getFollowedUser();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (chatboxRef.current) {
@@ -65,7 +63,6 @@ const ChatApp = () => {
     setSelectedFile(file);
     setSelectedFileName(file.name);
   };
-
 
   const handleClearFile = () => {
     fileInputRef.current.value = ''; // Clear the file input
@@ -95,15 +92,29 @@ const ChatApp = () => {
     }
     return null;
   };
-
-
-
+  const bgColor = useColorModeValue('gray.100', 'gray.700');
 
 
   return (
     <Box height="80vh" display="flex">
+
       {/* User List Panel */}
-      <Box width="25%" border="1px" borderRadius="md" borderTopRightRadius={0} borderBottomRightRadius={0} borderColor="gray.300" overflowY="auto">
+      <Box
+        width={{ base: '100%', md: '25%' }}
+        display={{ base: isUserListOpen ? 'block' : 'none', md: 'block' }}
+        border="1px"
+        borderRadius="md"
+        borderTopRightRadius={0}
+        borderBottomRightRadius={0}
+        borderColor="gray.300"
+        overflowY="auto"
+        position={{ base: 'fixed', md: 'relative' }}
+        top={{ base: '0', md: 'auto' }}
+        left={{ base: '0', md: 'auto' }}
+        height={{ base: '100%', md: 'auto' }}
+        zIndex="999"
+        bg={bgColor}
+      >
         <List spacing={3} p={4}>
           {userList.map((user) => (
             <ListItem
@@ -111,8 +122,13 @@ const ChatApp = () => {
               p={2}
               borderRadius={'md'}
               cursor="pointer"
-              bg={selectedUser && selectedUser.username === user.username ? 'gray.700' : 'transparent'}
-              onClick={() => selectedUser?.username !== user.username && handleUserClick(user)}
+              bg={selectedUser && selectedUser.username === user.username ? 'gray.400' : 'transparent'}
+              onClick={() => {
+                if (selectedUser?.username !== user.username) {
+                  handleUserClick(user);
+                  setIsUserListOpen(false); // Close user list on mobile after selecting a user
+                }
+              }}
             >
               <Flex align="center" position="relative">
                 <Avatar size="md" src={user.profileImage} mr={2} />
@@ -144,12 +160,10 @@ const ChatApp = () => {
             </ListItem>
           ))}
         </List>
-
       </Box>
 
-
       {/* Chat Panel */}
-      <Box width="70%" border="1px" borderRadius="md" borderTopLeftRadius={0} borderBottomLeftRadius={0} overflow="hidden">
+      <Box width={{ base: '100%', md: '70%' }} border="1px" borderRadius="md" borderTopLeftRadius={0} borderBottomLeftRadius={0} overflow="hidden">
         {/* Header */}
         <Flex
           align="center"
@@ -179,14 +193,13 @@ const ChatApp = () => {
           </Flex>
 
           <Menu>
-            <MenuButton as={IconButton} icon={<Icon as={FaEllipsisH} title="show more" />} />
+            <MenuButton onClick={() => setIsUserListOpen(!isUserListOpen)} as={IconButton} icon={<Icon as={FaEllipsisH} title="show more" />} />
             <MenuList>
               <MenuItem>Block</MenuItem>
               <MenuItem>Clear chats</MenuItem>
             </MenuList>
-          </Menu>
+          </Menu >          
         </Flex>
-
 
         {/* Chatbox with scrollable content */}
         <Flex direction="column" height="70vh">
@@ -275,8 +288,6 @@ const ChatApp = () => {
                     </Flex>
                   </Box>
                 )}
-
-
               </Flex>
             ))}
           </Box>
