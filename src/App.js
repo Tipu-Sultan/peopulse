@@ -56,6 +56,8 @@ import Activation from "./auth/Activation";
 import SearchBar from "./services/SearchBar";
 import PageNotFound from "./services/PageNotFound";
 import Reels from "./home/Reels";
+import Setting from "./home/Setting";
+
 
 const LinkItems = (isUser) => {
   if (isUser) {
@@ -302,6 +304,8 @@ const SidebarWithHeader = () => {
               <Route path="/profile/:username" element={<Profile />} />
               <Route path="/friends" element={<Follow />} />
               <Route path="/request" element={<Request />} />
+              <Route path="/settings" element={<Setting />} />
+
             </>
           ) : (
             <Route path="/" element={<Login />} />

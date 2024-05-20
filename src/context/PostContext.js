@@ -215,50 +215,50 @@ export const PostProvider = ({ children }) => {
 
   const RenderContent = (contentType, media, content) => {
     if (contentType === "image") {
-      return (
-        <>
-          {content && <Text py={2}>{content}</Text>}
-          <Image
-            borderRadius="lg"
-            src={`${media}`}
-            alt="Post Image"
-            objectFit="cover"
-          />
-        </>
-      );
+        return (
+            <>
+                {content && <Text py={2}>{content}</Text>}
+                <Image
+                    borderRadius="lg"
+                    src={`${media}`}
+                    alt="Post Image"
+                    objectFit="cover"
+                />
+            </>
+        );
     } else if (contentType === "video") {
-      return (
-        <>
-          {content && <Text py={2}>{content}</Text>}
-          <AspectRatio ratio={16 / 9}>
-            <video
-              src={`${media}`}
-              title="Post Video"
-              allowFullScreen
-              mute
-              controls
-            ></video>
-          </AspectRatio>
-        </>
-      );
-    } else if (contentType === "audio") { // Added audio content type
-      return (
-        <>
-          {content && <Text py={2}>{content}</Text>}
-          <audio
-            src={`${media}`}
-            title="Post Audio"
-            controls
-          ></audio>
-        </>
-      );
+        return (
+            <>
+                {content && <Text py={2}>{content}</Text>}
+                <AspectRatio ratio={16 / 9}>
+                    <video
+                        src={`${media}`}
+                        title="Post Video"
+                        allowFullScreen
+                        muted
+                        controls
+                        style={{ width: '100%', height: '100%' }} // Set video dimensions
+                    ></video>
+                </AspectRatio>
+            </>
+        );
+    } else if (contentType === "audio") {
+        return (
+            <>
+                {content && <Text py={2}>{content}</Text>}
+                <audio
+                    src={`${media}`}
+                    title="Post Audio"
+                    controls
+                ></audio>
+            </>
+        );
     } else if (contentType === "text") {
-      return <Text mb="4">{content}</Text>;
+        return <Text mb="4">{content}</Text>;
     } else {
-      // Handle unsupported content types or show a placeholder
-      return <Text mb="4">Unsupported content type</Text>;
+        return <Text mb="4">Unsupported content type</Text>;
     }
-  };
+};
 
 
   useEffect(() => {
