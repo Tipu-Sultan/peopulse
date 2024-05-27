@@ -129,7 +129,7 @@ export const ChatsProvider = ({ children }) => {
     const checkTyping = () => {
         setIsTyping(true);
         const roomId = [isUser.username, selectedUser?.username].sort().join('@');
-        socket.emit('privateTyping', { roomId, isTyping: true, senderUsername: isUser.username });
+        socket.emit('privateTyping', { roomId, isTyping: true, senderUsername: selectedUser.username });
     };
 
     useEffect(() => {

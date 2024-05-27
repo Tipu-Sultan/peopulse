@@ -4,12 +4,15 @@ import {
   Text, Menu, MenuButton, MenuList, MenuItem, IconButton,
   Input, Button, Image, Divider, Icon,
   useColorMode,
-  useColorModeValue
+  useColorModeValue,
+  useDisclosure
 } from '@chakra-ui/react';
-import { FaEllipsisH, FaTrash, FaFileDownload, FaPaperclip, FaBars, FaTimes } from 'react-icons/fa';
+import { FaEllipsisH, FaTrash, FaFileDownload, FaPaperclip, FaBars, FaTimes, FaPhone, FaVideo } from 'react-icons/fa';
 import { CloseIcon } from '@chakra-ui/icons';
 import { useChats } from '../context/ChatsContext'; // Assuming you have a custom hook for chat logic
 import { calculateTimeDifference } from '../services/timeConvert';
+import AudioVideoCall from '../ui-modals/AudioVideoCall';
+import { useCall } from '../context/CallContext';
 const ChatApp = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isUserListOpen, setIsUserListOpen] = useState(false);
@@ -28,6 +31,7 @@ const ChatApp = () => {
     getFollowedUser, handleSendMessage,
     handleDeleteMessage
   } = useChats();
+  const { callUser, setCallType, isOpen, onOpen, onClose } = useCall();
 
   useEffect(() => {
     getFollowedUser();
@@ -93,7 +97,13 @@ const ChatApp = () => {
     return null;
   };
   const bgColor = useColorModeValue('gray.100', 'gray.700');
+  // const roomId = [selectedUser?.username, isUser?.username].sort().join('@');
 
+  const handleCallClick = (type) => {
+    setCallType(type);
+    onOpen();
+    callUser(selectedUser?.username)
+  };
 
   return (
     <Box height="80vh" display="flex">
@@ -175,7 +185,8 @@ const ChatApp = () => {
         >
           <Flex align="center">
             <Avatar size="md" src={selectedUser && selectedUser.profileImage} mr="2" />
-            <Box>
+
+            <Box mr="2">
               <Text fontWeight="bold">
                 {selectedUser && selectedUser.firstname + ' ' + selectedUser.lastname}
               </Text>
@@ -190,6 +201,23 @@ const ChatApp = () => {
                 </Text>
               )}
             </Box>
+            {selectedUser && (
+              <>
+                <IconButton
+                  icon={<FaPhone />}
+                  aria-label="Audio Call"
+                  onClick={() => handleCallClick('audio')}
+                  mr="2"
+                />
+                <IconButton
+                  icon={<FaVideo />}
+                  aria-label="Video Call"
+                  onClick={() => handleCallClick('video')}
+                  mr="2"
+                />
+              </>
+            )
+            }
           </Flex>
 
           <Menu>
@@ -198,7 +226,7 @@ const ChatApp = () => {
               <MenuItem>Block</MenuItem>
               <MenuItem>Clear chats</MenuItem>
             </MenuList>
-          </Menu >          
+          </Menu >
         </Flex>
 
         {/* Chatbox with scrollable content */}
@@ -338,6 +366,12 @@ const ChatApp = () => {
           )}
         </Flex>
       </Box>
+      <AudioVideoCall
+        isOpen={isOpen}
+        onClose={onClose}
+        selectedUser={selectedUser}
+        isUser={isUser}
+      />
     </Box>
   );
 };

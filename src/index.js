@@ -9,6 +9,7 @@ import { PostProvider } from './context/PostContext';
 import { FollowProvider } from './context/FollowContext';
 import { ChatsProvider } from './context/ChatsContext';
 import { StoryProvider } from './context/StoryContext';
+import { CallProvider } from './context/CallContext';
 const colors = {
   brand: {
     900: '#1a365d',
@@ -29,9 +30,11 @@ root.render(
           <FollowProvider>
             <ChatsProvider>
             <StoryProvider>
+              <CallProvider>
               <ChakraProvider theme={theme}>
                 <App />
               </ChakraProvider>
+              </CallProvider>
               </StoryProvider>
             </ChatsProvider>
           </FollowProvider>
