@@ -5,6 +5,7 @@ const ChatsContext = createContext();
 
 export const ChatsProvider = ({ children }) => {
     const API_HOST = process.env.REACT_APP_API_HOST;
+    const chatboxRef = useRef(null);
     const token = localStorage.getItem("token");
     const isLogin = localStorage.getItem("userData");
     const isUser = isLogin ? JSON.parse(isLogin) : null;
@@ -18,24 +19,27 @@ export const ChatsProvider = ({ children }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isTyping, setIsTyping] = useState(null);
     const [typingUser, setTypingUser] = useState(null);
-
+    const [isUserListOpen, setIsUserListOpen] = useState(false);
+    const [messageText, setMessageText] = useState('')
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
 
     const handleSendMessage = async (messageText, receiverUsername) => {
         try {
-            if (!messageText.trim()) {
+            if (!messageText.trim()&& !selectedFile) {
                 return;
             }
-
-            const roomId = [isUser.username, receiverUsername].sort().join('@');
+            const roomId = [isUser.username, receiverUsername].sort().join('_');
 
             const formData = new FormData();
-            formData.append('message', messageText);
             formData.append('roomId', roomId);
             formData.append('senderUsername', isUser.username);
             formData.append('receiverUsername', receiverUsername);
 
             // Add file to formData if selectedFile is present
+            if (messageText!=='') {
+                formData.append('message', messageText);
+            }
             if (selectedFile) {
                 formData.append('file', selectedFile);
             }
@@ -59,8 +63,10 @@ export const ChatsProvider = ({ children }) => {
         }
     };
 
-
-
+    const handleSendClick = () => {
+        handleSendMessage(messageText, selectedUser && selectedUser.username);
+        setMessageText(''); 
+    };
     const getFollowedUser = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -95,10 +101,9 @@ export const ChatsProvider = ({ children }) => {
     };
 
     const handleUserClick = (user) => {
-        const roomId = [isUser.username, user.username].sort().join('@');
         setSelectedUser(user);
         getAllSenderReciverMsg(isUser.username, user.username)
-        socket.emit('joinRoom', roomId);
+        socket.emit('joinRoom', { sender: isUser.username, receiver: user.username });
     };
 
     const handleDeleteMessage = async (msgId, roomId) => {
@@ -127,10 +132,34 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        setIsTyping(true);
-        const roomId = [isUser.username, selectedUser?.username].sort().join('@');
+        const roomId = [isUser.username, selectedUser?.username].sort().join('_');
         socket.emit('privateTyping', { roomId, isTyping: true, senderUsername: selectedUser.username });
     };
+
+    const getLastMessage = (currentUser, otherUser) => {
+        const userMessages = allmessages.filter(message =>
+          (message.senderUsername === currentUser && message.receiverUsername === otherUser) ||
+          (message.senderUsername === otherUser && message.receiverUsername === currentUser)
+        );
+    
+        const unreadMessages = userMessages.filter(message =>
+          message.receiverUsername === currentUser && !message.isRead
+        );
+    
+        const unreadCount = unreadMessages.length;
+    
+        if (userMessages.length > 0) {
+          const lastMessage = userMessages[userMessages.length - 1];
+          return {
+            message: lastMessage.message,
+            timestamp: lastMessage.timestamp,
+            isRead: lastMessage.isRead,
+            unreadCount: unreadCount
+          };
+        }
+        return null;
+      };
+
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -147,7 +176,7 @@ export const ChatsProvider = ({ children }) => {
         };
     
         fetchMessages();
-      }, [messages]);
+      }, [API_HOST, selectedUser, token]);
 
     useEffect(() => {
         const typingTimeout = setTimeout(() => {
@@ -165,7 +194,7 @@ export const ChatsProvider = ({ children }) => {
 
         socket.on('isTyping', ({ isTyping, senderUsername }) => {
             if (isTyping) {
-                setIsTyping(true);
+                setIsTyping(isTyping);
                 setTypingUser(senderUsername);
             } else {
                 setIsTyping(false);
@@ -184,7 +213,6 @@ export const ChatsProvider = ({ children }) => {
             socket.off('message');
             socket.off('isTyping');
             socket.off('deletedMessage');
-            socket.off('joinRoom');
         };
     }, [messages]);
 
@@ -193,6 +221,8 @@ export const ChatsProvider = ({ children }) => {
     return (
         <ChatsContext.Provider
             value={{
+                chatboxRef,
+                API_HOST,
                 checkTyping,
                 isTyping,
                 typingUser,
@@ -213,6 +243,14 @@ export const ChatsProvider = ({ children }) => {
                 getFollowedUser,
                 setMessages,
                 handleDeleteMessage,
+                isUserListOpen, 
+                setIsUserListOpen,
+                getLastMessage,
+                handleSendClick,
+                isMobile, 
+                setIsMobile,
+                messageText, 
+                setMessageText
             }}
         >
             {children}

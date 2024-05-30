@@ -31,7 +31,9 @@ const AudioVideoCall = ({
         leaveCall,
         receivingCall,
         isUser,
-        callEnded
+        callEnded,
+        callDuration,
+        formatTime
     } = useCall();
     return (
         <Modal isOpen={isOpen && !callEnded} onClose={onClose} size="lg">
@@ -44,7 +46,7 @@ const AudioVideoCall = ({
                         <Text>Calling {selectedUser?.firstname + ' ' + selectedUser?.lastname}</Text>
                     </Box>
                     <Box>
-                        {callType === "video" && stream && (
+                        {(callType === "video" || callType === "audio") && stream && (
                             <>
                                 <Text>{isUser?.firstname}</Text>
                                 <video playsInline muted ref={myVideo} autoPlay style={{ width: "300px" }} />
@@ -52,8 +54,8 @@ const AudioVideoCall = ({
                         )}
                     </Box>
                     <Box>
-                        <Text>{selectedUser?.firstname}</Text>
-                        {callType === "video" && callAccepted && (
+                        <Text>{selectedUser?.firstname} <h2>Call Duration: {formatTime(callDuration)}</h2></Text>
+                        {(callType === "video" || callType === "audio") && callAccepted && (
                             <video playsInline ref={userVideo} autoPlay style={{ width: "300px" }} />
                         )}
                     </Box>

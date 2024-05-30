@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      if (!isUser) {
+      if (isUser) {
         const token = localStorage.getItem('token');
 
         const config = {
