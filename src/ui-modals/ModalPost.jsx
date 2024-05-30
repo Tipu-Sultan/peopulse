@@ -20,12 +20,20 @@ import { CloseIcon, AttachmentIcon } from "@chakra-ui/icons";
 import { usePost } from "../context/PostContext";
 
 const ModalPost = () => {
-  const {isModalOpen,handleCloseModal,loading,selectedFile,handleFileChange,handlePost,postText,setPostText} = usePost();
+  const { 
+    setCheckEditPost,
+    setEditPost, editPost, 
+    checkEditPost, isModalOpen,
+    handleCloseModal, loading, 
+    selectedFile, handleFileChange, 
+    handlePost, postText, setPostText } = usePost();
 
   const cancelFile = () => {
     if (typeof handleFileChange === "function") {
       handleFileChange({ target: { files: [] } });
     }
+    setCheckEditPost(false);
+    setEditPost(null)
   };
 
   const handleTextChange = (e) => {
@@ -34,6 +42,7 @@ const ModalPost = () => {
       setPostText(newText);
     }
   };
+
 
   return (
     <div>
@@ -49,10 +58,10 @@ const ModalPost = () => {
                 mb="2"
                 resize="none"
                 minH="100px"
-                value={postText}
+                value={postText || editPost?.content}
                 onChange={handleTextChange}
               />
-              <InputGroup mb="4">
+              {!checkEditPost && <InputGroup mb="4">
                 <Input
                   type="file"
                   onChange={handleFileChange}
@@ -67,9 +76,9 @@ const ModalPost = () => {
                     cursor="pointer"
                   />
                 </label>
-              </InputGroup>
+              </InputGroup>}
 
-              {selectedFile && (
+              {(selectedFile || checkEditPost) && (
                 <Box mt="2" position="relative">
                   <IconButton
                     icon={<CloseIcon />}
@@ -80,29 +89,30 @@ const ModalPost = () => {
                     right="0"
                     zIndex="1"
                   />
-                  {selectedFile.type.startsWith("image/") ? (
+                  {(selectedFile?.type?.startsWith("image/") || editPost?.contentType?.split("/")[0] === 'image') ? (
                     <Image
-                      src={URL.createObjectURL(selectedFile)}
+                      src={selectedFile ? URL.createObjectURL(selectedFile) : checkEditPost && editPost?.media}
                       alt="Preview"
                       maxH="200px"
                     />
                   ) : (
                     <video width="100%" height="200" controls>
                       <source
-                        src={URL.createObjectURL(selectedFile)}
-                        type={selectedFile.type}
+                        src={selectedFile ? URL.createObjectURL(selectedFile) : checkEditPost && editPost?.media}
+                        type={selectedFile?.type || (checkEditPost && editPost?.contentType)}
                       />
                       Your browser does not support the video tag.
                     </video>
                   )}
                 </Box>
               )}
+
             </Flex>
           </ModalBody>
 
           <ModalFooter>
             <Text color="gray.500" mr="auto">
-              {postText.length}/300
+              {postText.length || editPost?.content.length}/300
             </Text>
             <Button
               colorScheme="blue"
@@ -111,7 +121,7 @@ const ModalPost = () => {
               isDisabled={postText.length === 0}
               isLoading={loading}
             >
-              {loading?'Posting...':'Post'}
+              {loading ? 'Posting...' : 'Post'}
             </Button>
             <Button onClick={handleCloseModal}>Cancel</Button>
           </ModalFooter>

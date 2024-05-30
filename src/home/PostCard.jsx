@@ -23,7 +23,7 @@ import { usePost } from "../context/PostContext";
 
 
 const PostCard = () => {
-  const { posts, handleLike, deleteAuthPost, user, RenderContent, handleSharePost } = usePost();
+  const { posts, handleLike, deleteAuthPost, user, RenderContent, handleSharePost,EditPostByAuthUser } = usePost();
   const [commentModalOpen, setCommentModalOpen] = useState(null)
 
   const filteredPosts = posts.filter(post => {
@@ -95,8 +95,8 @@ const PostCard = () => {
                   <MenuButton variant={'ghost'} as={IconButton} icon={<Icon as={FaEllipsisH} title="show more" />} />
                   <MenuList>
                     {user._id === post.user && <MenuItem onClick={() => deleteAuthPost(post._id)}>Delete post</MenuItem>}
-                    <MenuItem>report</MenuItem>
-                    {user._id === post.user && <MenuItem>Edit</MenuItem>}
+                    <MenuItem>Report</MenuItem>
+                    {user._id === post.user && <MenuItem onClick={()=>EditPostByAuthUser(post)}>Edit</MenuItem>}
                   </MenuList>
                 </Menu>
                 <CloseButton title="Not intrested" />

@@ -15,6 +15,10 @@ export const PostProvider = ({ children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSendAction, SetIsSendAction] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [checkEditPost, setCheckEditPost] = useState(false);
+  const [editPost, setEditPost] = useState(null);
+
+
   const navigate = useNavigate();
 
   const handleOpenModal = () => {
@@ -304,6 +308,12 @@ export const PostProvider = ({ children }) => {
     SetIsSendAction(true);
   }
 
+  const EditPostByAuthUser = (post) =>{
+    handleOpenModal(true);
+    setCheckEditPost(true);
+    setEditPost(post)
+  }
+
   return (
     <PostContext.Provider
       value={{
@@ -328,6 +338,11 @@ export const PostProvider = ({ children }) => {
         setCommentText,
         commentText,
         deleteAuthPost,
+        EditPostByAuthUser,
+        checkEditPost,
+        editPost,
+        setCheckEditPost,
+        setEditPost
       }}
     >
       {children}
