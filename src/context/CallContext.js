@@ -92,9 +92,7 @@ export const CallProvider = ({ children }) => {
 
 
   const callUser = (userToCall) => {
-    const username = isUser.username;
-    socket.emit('CallToRegisterUser', { sender: isUser.username, receiver: userToCall });
-
+    
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -105,7 +103,7 @@ export const CallProvider = ({ children }) => {
       socket.emit('callUser', {
         userToCall: userToCall,
         signalData: data,
-        from: username,
+        from: isUser.username,
       });
     });
 

@@ -29,8 +29,7 @@ export const ChatsProvider = ({ children }) => {
             if (!messageText.trim()&& !selectedFile) {
                 return;
             }
-            const roomId = receiverUsername;
-
+            const roomId = [isUser.username, receiverUsername].sort().join('_');
             const formData = new FormData();
             formData.append('roomId', roomId);
             formData.append('senderUsername', isUser.username);
@@ -103,6 +102,8 @@ export const ChatsProvider = ({ children }) => {
         setSelectedUser(user);
         getAllSenderReciverMsg(isUser.username, user.username)
         socket.emit('joinRoom', { sender: isUser.username, receiver: user.username });
+        socket.emit('CallToRegisterUser', { sender: isUser.username, receiver: user.username });
+
     };
 
     const handleDeleteMessage = async (msgId, roomId) => {
@@ -131,8 +132,8 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        // const roomId = [isUser.username, selectedUser?.username].sort().join('_');
-        socket.emit('privateTyping', { roomId:selectedUser?.username, isTyping: true, senderUsername: isUser.username });
+        const roomId = [isUser.username, selectedUser?.username].sort().join('_');
+        socket.emit('privateTyping', { roomId, isTyping: true, senderUsername: isUser.username });
     };
 
     const getLastMessage = (currentUser, otherUser) => {

@@ -85,7 +85,7 @@ const ChatBox = () => {
                                         icon={<FaTrash />}
                                         size="sm"
                                         aria-label="Delete Message"
-                                        onClick={() => handleDeleteMessage(message._id, message.receiverUsername)}
+                                        onClick={() => handleDeleteMessage(message._id, message.roomId)}
                                         mr="2"
                                     />
                                 )}
