@@ -141,8 +141,13 @@ export const CallProvider = ({ children }) => {
   };
 
   const declineCall = () => {
-    setReceivingCall(false);
     stopTimer()
+    setCallAccepted(false);
+    setCallEnded(false);
+    setCallerSignal(null);
+    setReceivingCall(false);
+    setStream(null);
+    onClose()
     if(callType==='video'){
       setCallType('video')
     }else{
