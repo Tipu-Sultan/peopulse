@@ -53,8 +53,6 @@ export const ChatsProvider = ({ children }) => {
 
             const savedMessage = response.data.newMessage;
             socket.emit('privateMessage', savedMessage);
-            setMessages((prevMessages) => [...prevMessages, savedMessage]);
-
             // Reset selectedFile and fileName after sending the message
             setSelectedFile(null);
             setSelectedFileName('');
