@@ -29,7 +29,7 @@ export const ChatsProvider = ({ children }) => {
             if (!messageText.trim()&& !selectedFile) {
                 return;
             }
-            const roomId = [isUser.username, receiverUsername].sort().join('_');
+            const roomId = receiverUsername;
 
             const formData = new FormData();
             formData.append('roomId', roomId);
@@ -53,6 +53,7 @@ export const ChatsProvider = ({ children }) => {
 
             const savedMessage = response.data.newMessage;
             socket.emit('privateMessage', savedMessage);
+            setMessages((prevMessages) => [...prevMessages, savedMessage]);
 
             // Reset selectedFile and fileName after sending the message
             setSelectedFile(null);
@@ -132,8 +133,8 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        const roomId = [isUser.username, selectedUser?.username].sort().join('_');
-        socket.emit('privateTyping', { roomId, isTyping: true, senderUsername: selectedUser.username });
+        // const roomId = [isUser.username, selectedUser?.username].sort().join('_');
+        socket.emit('privateTyping', { roomId:selectedUser?.username, isTyping: true, senderUsername: isUser.username });
     };
 
     const getLastMessage = (currentUser, otherUser) => {
