@@ -142,7 +142,7 @@ const StoryList = () => {
               key={isUser._id}
               username={isUser?.username}
               image={isUser.profileImage}
-              totalStories={1}
+              totalStories={loggedInUserStory.length}
               stories={loggedInUserStory}
             />
           )}

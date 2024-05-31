@@ -93,7 +93,7 @@ export const CallProvider = ({ children }) => {
 
   const callUser = (userToCall) => {
     const username = isUser.username;
-    socket.emit('CallToRegisterUser', username);
+    socket.emit('CallToRegisterUser', { sender: isUser.username, receiver: userToCall });
 
     const peer = new Peer({
       initiator: true,

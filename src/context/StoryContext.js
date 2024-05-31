@@ -75,7 +75,7 @@ export const StoryProvider = ({ children }) => {
 
             if (response.status === 200) {
                 const updatedStories = stories.filter((story) => story._id !== _id);
-                setStories(updatedStories);
+                socket.emit('deleteStory', updatedStories)
             } else {
                 console.error('Failed to delete story:', response.status, response.statusText);
             }
@@ -103,16 +103,16 @@ export const StoryProvider = ({ children }) => {
 
     useEffect(() => {
 
-        socket.on('deletePost', (updatedStories) => {
+        socket.on('storyDeleted', (updatedStories) => {
             setStories(updatedStories);
         });
-        socket.on('addStory', (newStoryData) => {
+        socket.on('storyAdded', (newStoryData) => {
             setStories((prevStories) => [...prevStories, newStoryData]);
         });
 
         return () => {
-            socket.off('addStory');
             socket.off('deleteStory');
+            socket.off('addStory');
         };
     }, [stories]);
 

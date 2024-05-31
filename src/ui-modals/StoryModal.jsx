@@ -5,7 +5,7 @@ import { useStory } from "../context/StoryContext";
 import { AttachmentIcon } from "@chakra-ui/icons";
 
 const StoryModal = ({ isOpen, onClose }) => {
-  const {wait,selectedFile,setSelectedFile,setTtextData, contentType, handleSubmit, handleContentTypeChange } = useStory();
+  const {textData,wait,selectedFile,setSelectedFile,setTtextData, contentType, handleSubmit, handleContentTypeChange } = useStory();
 
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
@@ -82,7 +82,7 @@ const StoryModal = ({ isOpen, onClose }) => {
           ) : null}
         </ModalBody>
         <ModalFooter>
-          <Button isLoading={wait} colorScheme="blue" mr={3} onClick={handleSubmit} size="md">
+          <Button isLoading={wait} isDisabled={textData?.length<=0 || !contentType} colorScheme="blue" mr={3} onClick={handleSubmit} size="md">
             Post Story
           </Button>
           <Button onClick={onClose} size="md">Cancel</Button>

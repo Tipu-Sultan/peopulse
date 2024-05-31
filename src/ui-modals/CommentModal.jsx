@@ -49,7 +49,7 @@ const CommentModal = ({
               {postComments.length > 0 ? postComments.map((comment, index) => (
                 <Flex key={index} align="start" justify="space-between" w="100%">
                   <Flex align="start">
-                    <Avatar size="sm" src={`${API_HOST}/${comment.profileImage}`} />
+                    <Avatar size="sm" src={`${comment.profileImage}` || comment.username} />
                     <VStack align="start" ml="2">
                       <Text>
                         <b>{comment?.username}</b> <br />{comment.text}
