@@ -43,7 +43,7 @@ export const CallProvider = ({ children }) => {
 
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: callType==='video', audio: true }).then((stream) => {
+    isOpen && navigator.mediaDevices.getUserMedia({ video: callType==='video', audio: true }).then((stream) => {
       setStream(stream);
       if (myVideo.current) {
         myVideo.current.srcObject = stream;
