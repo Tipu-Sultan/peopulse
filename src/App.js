@@ -168,12 +168,14 @@ const MobileNav = ({ onOpen, logout, isUser, ...rest }) => {
       />
       <SearchBar />
       <HStack spacing={{ base: "0", md: "6" }} ml={2}>
-        <IconButton
+        {isUser&&
+          <IconButton
           aria-label="Toggle color mode"
           icon={<ChatIcon />}
           as={Link}
           to={'/chat'}
         />
+        }
         <IconButton
           aria-label="Toggle color mode"
           icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
