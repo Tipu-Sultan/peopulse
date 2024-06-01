@@ -40,7 +40,7 @@ const AudioVideoCall = ({
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>{callType === "video" ? "Video" : "Audio"} Call</ModalHeader>
-                <ModalCloseButton />
+                <ModalCloseButton onClick={declineCall}/>
                 <ModalBody>
                     <Box>
                         {(callType === "video" || callType === "audio") && stream && (

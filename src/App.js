@@ -253,7 +253,7 @@ const MobileNav = ({ onOpen, logout, isUser, ...rest }) => {
                     Profile
                   </MenuItem>
                   <MenuItem as={Link} to={'/forgot'}>Change Password</MenuItem>
-                  <MenuItem onClick={logout}>Sign out</MenuItem>
+                  <MenuItem onClick={logout}>Log out</MenuItem>
                 </MenuList>
               </>
             )}

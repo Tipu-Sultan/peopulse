@@ -88,7 +88,7 @@ const Login = () => {
                 }}
                 isLoading={wait}
                 onClick={() => login(user)}>
-                Sign in
+                Log in
               </Button>
             </Stack>
           </Stack>
