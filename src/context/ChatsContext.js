@@ -29,7 +29,7 @@ export const ChatsProvider = ({ children }) => {
             if (!messageText.trim()&& !selectedFile) {
                 return;
             }
-            const roomId = [isUser.username, receiverUsername].sort().join('_');
+            const roomId = receiverUsername;
             const formData = new FormData();
             formData.append('roomId', roomId);
             formData.append('senderUsername', isUser.username);
@@ -52,6 +52,7 @@ export const ChatsProvider = ({ children }) => {
 
             const savedMessage = response.data.newMessage;
             socket.emit('privateMessage', savedMessage);
+            setMessages((prevMessages) => [...prevMessages, savedMessage]);
             // Reset selectedFile and fileName after sending the message
             setSelectedFile(null);
             setSelectedFileName('');
@@ -132,8 +133,7 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        const roomId = [isUser.username, selectedUser?.username].sort().join('_');
-        socket.emit('privateTyping', { roomId, isTyping: true, senderUsername: isUser.username });
+        socket.emit('privateTyping', {isTyping: true, reciverUsername: selectedUser?.username });
     };
 
     const getLastMessage = (currentUser, otherUser) => {
@@ -192,10 +192,10 @@ export const ChatsProvider = ({ children }) => {
             setMessages((prevMessages) => [...prevMessages, savedMessage]);
         });
 
-        socket.on('isTyping', ({ isTyping, senderUsername }) => {
+        socket.on('isTyping', ({ isTyping, reciverUsername }) => {
             if (isTyping) {
                 setIsTyping(isTyping);
-                setTypingUser(senderUsername);
+                setTypingUser(reciverUsername);
             } else {
                 setIsTyping(false);
                 setTypingUser(null);

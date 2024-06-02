@@ -26,7 +26,7 @@ const ChatApp = () => {
     getFollowedUser();
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 796);
     };
 
     window.addEventListener('resize', handleResize);
