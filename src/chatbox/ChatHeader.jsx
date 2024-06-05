@@ -16,7 +16,7 @@ const ChatHeader = () => {
             bg={bgColor}
             p="2"
             borderBottom="1px"
-            borderColor="gray.700"
+            borderColor="gray.300"
         >
             <Flex align="center">
                 {isMobile && (
