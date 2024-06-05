@@ -40,18 +40,18 @@ export default function Follow() {
     const { users, handleFollow, isUser, handleOpenModal } = useFollow();
 
     const isFollowed = (username, action) => {
-        return isUser.followers.some(follower => follower.followersUsername === username && follower.action === action && follower.logginUsername === isUser.username);
+        return isUser.followers?.some(follower => follower.followersUsername === username && follower.action === action && follower.logginUsername === isUser.username);
     };
 
     const isFollowing = (username, action) => {
-        return isUser.following.some(follow => follow.followingUsername === username && follow.action === action && follow.logginUsername === isUser.username);
+        return isUser.following?.some(follow => follow.followingUsername === username && follow.action === action && follow.logginUsername === isUser.username);
     };
 
-    const filteredUsers = users.filter(user => {
+    const filteredUsers = users?.filter(user => {
         if (filter === "followers") {
-            return isFollowed(user.username, 'Following');
+            return isFollowed(user?.username, 'Following');
         } else if (filter === "following") {
-            return isFollowing(user.username, 'Following');
+            return isFollowing(user?.username, 'Following');
         }
         return true;
     });
@@ -77,7 +77,7 @@ export default function Follow() {
                 templateColumns={{ base: "repeat(1, 1fr)", sm: "repeat(2, 1fr)", md: "repeat(4, 1fr)", lg: "repeat(5, 1fr)" }}
                 gap={4}
             >
-                {filteredUsers.map((user, i) => (
+                {filteredUsers?.map((user, i) => (
                     <GridItem key={user._id}>
                         <Box
                             maxW={'auto'}

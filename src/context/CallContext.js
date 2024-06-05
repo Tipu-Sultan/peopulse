@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useDisclosure } from '@chakra-ui/react';
 import Peer from 'simple-peer';
-import socket from '../services/socket';
 import { useChats } from './ChatsContext';
+import { useAuth } from './AuthContext';
 
 const CallContext = createContext();
 
 export const CallProvider = ({ children }) => {
+  const {socket} = useAuth()
   const isLogin = localStorage.getItem("userData");
   const isUser = isLogin ? JSON.parse(isLogin) : null;
   const {selectedUser} = useChats()
@@ -50,7 +51,7 @@ export const CallProvider = ({ children }) => {
       }
     });
 
-    socket.on('call-made', (data) => {
+    socket?.on('call-made', (data) => {
       onOpen()
       setReceivingCall(true);
       setCaller(data.from);
@@ -62,7 +63,7 @@ export const CallProvider = ({ children }) => {
       }
     });
 
-    socket.on('call-answered', (data) => {
+    socket?.on('call-answered', (data) => {
       setCallAccepted(true);
       startTimer()
       if(callType==='video'){
@@ -73,7 +74,7 @@ export const CallProvider = ({ children }) => {
       connectionRef.current.signal(data.signal);
     });
 
-    socket.on('call-ended', () => {
+    socket?.on('call-ended', () => {
       setCallAccepted(false);
       setCallEnded(false);
       setCallerSignal(null);
@@ -83,12 +84,11 @@ export const CallProvider = ({ children }) => {
     });
 
     return () => {
-      socket.off('call-made');
-      socket.off('call-answered');
-      socket.off('call-ended');
+      socket?.off('call-made');
+      socket?.off('call-answered');
+      socket?.off('call-ended');
     };
-
-  }, [isOpen, onClose, callAccepted, receivingCall, onOpen, callEnded, callType]);
+  }, [isOpen, onClose, callAccepted, receivingCall, onOpen, callEnded]);
 
 
   const callUser = (userToCall) => {
@@ -99,15 +99,15 @@ export const CallProvider = ({ children }) => {
       stream: stream,
     });
 
-    peer.on('signal', (data) => {
-      socket.emit('callUser', {
+    peer?.on('signal', (data) => {
+      socket?.emit('callUser', {
         userToCall: userToCall,
         signalData: data,
         from: isUser.username,
       });
     });
 
-    peer.on('stream', (stream) => {
+    peer?.on('stream', (stream) => {
       userVideo.current.srcObject = stream;
     });
 
@@ -128,15 +128,15 @@ export const CallProvider = ({ children }) => {
       stream: stream,
     });
 
-    peer.on('signal', (data) => {
+    peer?.on('signal', (data) => {
       socket.emit('answerCall', { signal: data, to: caller });
     });
 
-    peer.on('stream', (stream) => {
+    peer?.on('stream', (stream) => {
       userVideo.current.srcObject = stream;
     });
 
-    peer.signal(callerSignal);
+    peer?.signal(callerSignal);
     connectionRef.current = peer;
   };
 

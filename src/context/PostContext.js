@@ -2,11 +2,12 @@ import { AspectRatio, Image, Text } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import socket from '../services/socket';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
+  const {socket} = useAuth();
   const token = localStorage.getItem("token");
   const isLogin = localStorage.getItem("userData");
   const user = isLogin ? JSON.parse(isLogin) : null;
@@ -215,7 +216,7 @@ export const PostProvider = ({ children }) => {
     };
 
     fetchPosts();
-  }, [API_HOST, token]);
+  }, []);
 
   const RenderContent = (contentType, media, content) => {
     if (contentType === "image") {
@@ -266,7 +267,7 @@ export const PostProvider = ({ children }) => {
 
 
   useEffect(() => {
-    socket.on('addComment', (postIndex, commentData) => {
+    socket?.on('addComment', (postIndex, commentData) => {
       if (postIndex !== -1) {
         const updatedPosts = [...posts];
         updatedPosts[postIndex].comments = commentData;
@@ -274,11 +275,11 @@ export const PostProvider = ({ children }) => {
       }
     });
 
-    socket.on('deleteComment', (updatedPosts) => {
+    socket?.on('deleteComment', (updatedPosts) => {
       setPosts(updatedPosts);
     });
 
-    socket.on('handleLike', (postsData) => {
+    socket?.on('handleLike', (postsData) => {
       setPosts((prevPosts) => {
         return prevPosts.map((post) =>
           post._id === postsData.likedPost._id ? postsData.likedPost : post
@@ -286,20 +287,21 @@ export const PostProvider = ({ children }) => {
       });
     });
 
-    socket.on('deletePost', (updatedPosts) => {
+    socket?.on('deletePost', (updatedPosts) => {
       setPosts(updatedPosts);
     });
-    socket.on('addPost', (newPostData) => {
+    socket?.on('addPost', (newPostData) => {
       setPosts((prevPosts) => [...prevPosts, newPostData]);
     });
 
     return () => {
-      socket.off('addPost');
-      socket.off('deletePost');
-      socket.off('addComment');
-      socket.off('deleteComment');
-      socket.off('handleLike');
+      socket?.off('addPost');
+      socket?.off('deletePost');
+      socket?.off('addComment');
+      socket?.off('deleteComment');
+      socket?.off('handleLike');
     };
+
   }, [posts]);
 
   const handleSharePost = (postId, media, type) => {

@@ -6,10 +6,9 @@ import { useCall } from '../context/CallContext';
 import { HamburgerIcon } from '@chakra-ui/icons';
 
 const ChatHeader = () => {
-    const { isTyping, typingUser, selectedUser, setIsUserListOpen, isUserListOpen, isMobile } = useChats();
+    const {isOnline, isTyping, typingUser, selectedUser, setIsUserListOpen, isUserListOpen, isMobile } = useChats();
     const { handleCallClick } = useCall();
     const bgColor = useColorModeValue('gray.100', 'gray.700');
-
     return (
         <Flex
             align="center"
@@ -39,8 +38,8 @@ const ChatHeader = () => {
                             Typing...
                         </Text>
                     ) : (
-                        selectedUser && <Text fontWeight="bold" color={selectedUser?.isLogged ? 'green.500' : 'red.400'}>
-                            {selectedUser?.isLogged ? 'online' : 'offline'}
+                        selectedUser && <Text fontWeight="bold" color={isOnline?.includes(selectedUser?.username)? 'green.500' : 'red.400'}>
+                            {isOnline?.includes(selectedUser?.username) ? 'online' : selectedUser?.lastSeen}
                         </Text>
                     )}
                 </Box>

@@ -42,8 +42,8 @@ export default function Follow() {
   const { users, handleFollow, isUser, handleOpenModal } = useFollow();
 
   const isFollowed = (sid, action) => {
-    return users.some(user =>
-      user.followers.some(follower =>
+    return users?.some(user =>
+      user.followers?.some(follower =>
         follower.followersUsername === sid && follower.logginUsername === isUser.username &&
         follower.action === action
       )
@@ -52,8 +52,8 @@ export default function Follow() {
 
 
   const isFollowing = (sid, action) => {
-    return users.some(user =>
-      user.following.some(follow =>
+    return users?.some(user =>
+      user.following?.some(follow =>
         follow.followingUsername === sid && follow.logginUsername === isUser.username &&
         follow.action === action
       )

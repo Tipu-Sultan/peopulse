@@ -2,11 +2,12 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useDisclosure } from '@chakra-ui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import socket from '../services/socket';
+import { useAuth } from './AuthContext';
 
 const StoryContext = createContext();
 
 export const StoryProvider = ({ children }) => {
+    const { socket } = useAuth();
     const isLogin = localStorage.getItem("userData");
     const isUser = isLogin ? JSON.parse(isLogin) : null;
     const API_HOST = process.env.REACT_APP_API_HOST;
@@ -102,17 +103,16 @@ export const StoryProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-
-        socket.on('storyDeleted', (updatedStories) => {
+        socket?.on('storyDeleted', (updatedStories) => {
             setStories(updatedStories);
         });
-        socket.on('storyAdded', (newStoryData) => {
+        socket?.on('storyAdded', (newStoryData) => {
             setStories((prevStories) => [...prevStories, newStoryData]);
         });
 
         return () => {
-            socket.off('deleteStory');
-            socket.off('addStory');
+            socket?.off('deleteStory');
+            socket?.off('addStory');
         };
     }, [stories]);
 

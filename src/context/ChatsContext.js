@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import socket from '../services/socket';
+import { useAuth } from './AuthContext';
 const ChatsContext = createContext();
 
 export const ChatsProvider = ({ children }) => {
+    const {socket,onlineUser} = useAuth()
     const API_HOST = process.env.REACT_APP_API_HOST;
     const chatboxRef = useRef(null);
     const token = localStorage.getItem("token");
@@ -23,6 +24,8 @@ export const ChatsProvider = ({ children }) => {
     const [messageText, setMessageText] = useState('')
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+    const getOnlineUsers = localStorage.getItem("onlineUsers");
+    const isOnline = getOnlineUsers ? JSON.parse(getOnlineUsers) : null;
 
     const handleSendMessage = async (messageText, receiverUsername) => {
         try {
@@ -74,7 +77,6 @@ export const ChatsProvider = ({ children }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
             setUserList(response.data);
         } catch (error) {
             console.error('Error fetching user:', error);
@@ -100,10 +102,8 @@ export const ChatsProvider = ({ children }) => {
     };
 
     const handleUserClick = (user) => {
-        setSelectedUser(user);
         getAllSenderReciverMsg(isUser.username, user.username)
-        socket.emit('joinRoom', { sender: isUser.username, receiver: user.username });
-        socket.emit('CallToRegisterUser', { sender: isUser.username, receiver: user.username });
+        setSelectedUser(user);
 
     };
 
@@ -133,7 +133,7 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        socket.emit('privateTyping', {isTyping: true, reciverUsername: selectedUser?.username });
+        socket.emit('privateTyping', {isTyping: true, reciverUsername: selectedUser?.username,senderUsername: isUser?.username });
     };
 
     const getLastMessage = (currentUser, otherUser) => {
@@ -176,7 +176,7 @@ export const ChatsProvider = ({ children }) => {
         };
     
         fetchMessages();
-      }, [API_HOST, selectedUser, token]);
+      }, [selectedUser]);
 
     useEffect(() => {
         const typingTimeout = setTimeout(() => {
@@ -188,12 +188,14 @@ export const ChatsProvider = ({ children }) => {
 
     useEffect(() => {
         // Listen for new messages
-        socket.on('message', (savedMessage) => {
-            setMessages((prevMessages) => [...prevMessages, savedMessage]);
+        socket?.on('message', (savedMessage) => {
+            if(savedMessage.senderUsername === selectedUser.username) {
+                setMessages((prevMessages) => [...prevMessages, savedMessage]);
+            }
         });
 
-        socket.on('isTyping', ({ isTyping, reciverUsername }) => {
-            if (isTyping) {
+        socket?.on('isTyping', ({ isTyping, reciverUsername,senderUsername }) => {
+            if (isTyping && senderUsername === selectedUser.username) {
                 setIsTyping(isTyping);
                 setTypingUser(reciverUsername);
             } else {
@@ -203,16 +205,16 @@ export const ChatsProvider = ({ children }) => {
         });
 
         // Listen for deleted messages
-        socket.on('deletedMessage', (msgId) => {
+        socket?.on('deletedMessage', (msgId) => {
             const updatedMessages = messages.filter((message) => message._id !== msgId);
             setMessages(updatedMessages);
         });
 
         // Clean up event listeners on component unmount
         return () => {
-            socket.off('message');
-            socket.off('isTyping');
-            socket.off('deletedMessage');
+            socket?.off('message');
+            socket?.off('isTyping');
+            socket?.off('deletedMessage');
         };
     }, [messages]);
 
@@ -250,7 +252,8 @@ export const ChatsProvider = ({ children }) => {
                 isMobile, 
                 setIsMobile,
                 messageText, 
-                setMessageText
+                setMessageText,
+                isOnline
             }}
         >
             {children}

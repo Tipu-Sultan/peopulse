@@ -4,11 +4,9 @@ import { calculateTimeDifference } from '../services/timeConvert';
 import { useChats } from '../context/ChatsContext';
 
 const ChatPanel = () => {
-    const { getLastMessage, isUserListOpen, setIsUserListOpen, userList, selectedUser, isUser, handleUserClick } = useChats();
+    const {isOnline, getLastMessage, isUserListOpen, setIsUserListOpen, userList, selectedUser, isUser, handleUserClick } = useChats();
     const bgColor = useColorModeValue('gray.100', 'gray.700');
-
     return (
-
         <Box
             width={{ base: '100%', md: '25%' }}
             display={{ base: isUserListOpen ? 'block' : 'none', md: 'block' }}
@@ -29,6 +27,7 @@ const ChatPanel = () => {
 
             <List spacing={3} p={4}>
                 {userList.map((user) => (
+                    
                     <ListItem
                         key={user.id}
                         p={2}
@@ -46,7 +45,7 @@ const ChatPanel = () => {
                             <Avatar
                                 size="md" src={user.profileImage} mr={2} />
                             <Box position="absolute" top="2" right="0">
-                                {user?.isLogged ? (
+                                {isOnline?.includes(user?.username) ? (
                                     <Badge bg="green.600" borderRadius="full" boxSize="8px" />
                                 ) : (
                                     <Badge bg="red.600" borderRadius="full" boxSize="8px" />

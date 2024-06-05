@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { io } from 'socket.io-client';
 
 const AuthContext = createContext();
 
@@ -18,7 +19,8 @@ export const AuthProvider = ({ children }) => {
   const [wait, setwait] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loadedUser, setLoadedUser] = useState(null);
-
+  const [socket, setSocket] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     if (isRemember !== null) {
@@ -29,6 +31,28 @@ export const AuthProvider = ({ children }) => {
       }));
     }
   }, []);
+
+  useEffect(() => {
+    if (isUser) {
+      const socket = io(process.env.REACT_APP_API_HOST, {
+        query: {
+          userId: isUser.username,
+        }
+      });
+      setSocket(socket);
+      socket?.on('getOnlineUsers', (onlineUser) => {
+        setOnlineUsers(onlineUser);
+        localStorage.setItem('onlineUsers', JSON.stringify(onlineUser));
+
+      })
+      return () => socket.close();
+    } else {
+      if (socket) {
+        socket.close();
+        setSocket(null);
+      }
+    }
+  }, [])
 
 
 
@@ -217,6 +241,8 @@ export const AuthProvider = ({ children }) => {
         handleDeleteUser,
         getUserByUsername,
         loadedUser,
+        onlineUsers,
+        socket
       }}
     >
       {children}

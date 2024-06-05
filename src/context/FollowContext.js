@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import socket from '../services/socket';
 import axios from 'axios';
+import { useAuth } from './AuthContext';
 const FollowContext = createContext();
 
 export const FollowProvider = ({ children }) => {
+  const {socket} = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState([]);
@@ -41,7 +42,7 @@ export const FollowProvider = ({ children }) => {
     };
 
     fetchPosts();
-  }, [API_HOST, token]);
+  }, []);
 
   const handleFollow = async (username, action) => {
     try {
@@ -89,7 +90,8 @@ export const FollowProvider = ({ children }) => {
 
 
   useEffect(() => {
-    socket.on('follow-request', (followingbyreceiver, followedbySender, username, logginUser) => {
+   
+    socket?.on('follow-request', (followingbyreceiver, followedbySender, username, logginUser) => {
       setUsers((prevUsers) => {
         return prevUsers.map((user) => {
           if (user.username === username) {
@@ -105,7 +107,7 @@ export const FollowProvider = ({ children }) => {
     });
 
     return () => {
-      socket.off('follow-request');
+      socket?.off('follow-request');
     };
   }, []);
 
