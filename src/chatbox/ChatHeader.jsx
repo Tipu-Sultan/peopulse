@@ -38,8 +38,8 @@ const ChatHeader = () => {
                             Typing...
                         </Text>
                     ) : (
-                        selectedUser && <Text fontWeight="bold" color={isOnline?.includes(selectedUser?.username)? 'green.500' : 'red.400'}>
-                            {isOnline?.includes(selectedUser?.username) ? 'online' : selectedUser?.lastSeen}
+                        selectedUser && <Text fontWeight="bold" fontSize={'small'} color={isOnline?.includes(selectedUser?.username)? 'green.500' : 'green.400'}>
+                            {isOnline?.includes(selectedUser?.username) ? 'online' :'last seen at '+ selectedUser?.lastSeen}
                         </Text>
                     )}
                 </Box>

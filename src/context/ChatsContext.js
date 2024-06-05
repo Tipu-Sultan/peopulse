@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 const ChatsContext = createContext();
 
 export const ChatsProvider = ({ children }) => {
-    const {socket,onlineUser} = useAuth()
+    const {socket} = useAuth()
     const API_HOST = process.env.REACT_APP_API_HOST;
     const chatboxRef = useRef(null);
     const token = localStorage.getItem("token");
@@ -133,8 +133,9 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        socket.emit('privateTyping', {isTyping: true, reciverUsername: selectedUser?.username,senderUsername: isUser?.username });
+        socket.emit('privateTyping', {isTyping: true,TypingMsg: messageText, reciverUsername: selectedUser?.username,senderUsername: isUser?.username });
     };
+
 
     const getLastMessage = (currentUser, otherUser) => {
         const userMessages = allmessages.filter(message =>
@@ -194,7 +195,7 @@ export const ChatsProvider = ({ children }) => {
             }
         });
 
-        socket?.on('isTyping', ({ isTyping, reciverUsername,senderUsername }) => {
+        socket?.on('isTyping', ({ isTyping,TypingMsg, reciverUsername,senderUsername }) => {
             if (isTyping && senderUsername === selectedUser.username) {
                 setIsTyping(isTyping);
                 setTypingUser(reciverUsername);
@@ -203,6 +204,7 @@ export const ChatsProvider = ({ children }) => {
                 setTypingUser(null);
             }
         });
+
 
         // Listen for deleted messages
         socket?.on('deletedMessage', (msgId) => {

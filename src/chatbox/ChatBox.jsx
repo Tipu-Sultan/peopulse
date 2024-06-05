@@ -1,14 +1,21 @@
-import { Box, Button, Flex, IconButton, Image, Text } from '@chakra-ui/react'
-import React from 'react'
-import { FaFileDownload, FaTrash } from 'react-icons/fa'
+import { Box, Button, Flex, IconButton, Image, Text } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { FaFileDownload, FaTrash } from 'react-icons/fa';
 import { useChats } from '../context/ChatsContext';
 import { calculateTimeDifference } from '../services/timeConvert';
+import Lottie from 'react-lottie';
+import animationData from '../assets/typing.json';
 
 const ChatBox = () => {
     const {
         dowloadMessageFile, editableMessageId, isUser, messages,
-        handleDeleteMessage, chatboxRef, API_HOST, setEditableMessageId
+        handleDeleteMessage, chatboxRef, API_HOST, setEditableMessageId,
+        isTyping, typingUser, selectedUser
     } = useChats();
+
+    const [lastTap, setLastTap] = useState(0);
+    const [doubleTapTimeout, setDoubleTapTimeout] = useState(null);
+
     const handleDoubleClick = (messageId) => {
         setEditableMessageId(messageId);
     };
@@ -16,8 +23,36 @@ const ChatBox = () => {
     const handleSingleClick = () => {
         setEditableMessageId(null);
     };
+
+    const handleTap = (messageId) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+
+        clearTimeout(doubleTapTimeout);
+
+        if (tapLength < 300 && tapLength > 0) {
+            handleDoubleClick(messageId);
+        } else {
+            const timeout = setTimeout(() => {
+                handleSingleClick();
+            }, 300);
+            setDoubleTapTimeout(timeout);
+        }
+
+        setLastTap(currentTime);
+    };
+
+    const defaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+        rendererSettings: {
+            preserveAspectRatio: 'xMidYMid slice'
+        }
+    };
+
     return (
-        <Box p="4" flex="1" overflowY="scroll" ref={chatboxRef}>
+        <Box p="4" flex="1" overflowY="scroll" ref={chatboxRef} position="relative">
             {messages.map((message) => (
                 <Flex
                     key={message._id}
@@ -30,11 +65,10 @@ const ChatBox = () => {
                         position: 'relative',
                     }}
                     onDoubleClick={() => handleDoubleClick(message._id)}
-                    onClick={handleSingleClick}
+                    onClick={() => handleTap(message._id)}
                 >
                     <Box
-                        maxWidth="50%"
-                        maxHeight="50%"
+                        maxWidth="80%"
                         bg={message.senderUsername === isUser.username ? 'blue.400' : 'gray.200'}
                         color={message.senderUsername === isUser.username ? 'white' : 'black'}
                         p="3"
@@ -104,8 +138,22 @@ const ChatBox = () => {
                     )}
                 </Flex>
             ))}
+            {selectedUser && isTyping && typingUser &&
+                <Flex
+                    position="absolute"
+                    bottom="10px"
+                    left="10px"
+                    alignItems="center"
+                >
+                    <Lottie
+                        width={70}
+                        options={defaultOptions}
+                        style={{ marginBottom: 15 }}
+                    />
+                </Flex>
+            }
         </Box>
-    )
+    );
 }
 
-export default ChatBox
+export default ChatBox;

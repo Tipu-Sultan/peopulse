@@ -36,7 +36,6 @@ const FollowButton = ({ text, onClick, bgColor }) => (
 );
 
 export default function Follow() {
-  const API_HOST = process.env.REACT_APP_API_HOST;
   const [rid, setRid] = useState()
   const bgColor = useColorModeValue("gray.100", "gray.900");
   const { users, handleFollow, isUser, handleOpenModal } = useFollow();

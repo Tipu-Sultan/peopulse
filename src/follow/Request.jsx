@@ -33,7 +33,6 @@ const FollowButton = ({ text, onClick, bgColor }) => (
 );
 
 export default function Follow() {
-    const API_HOST = process.env.REACT_APP_API_HOST;
     const [rid, setRid] = useState();
     const [filter, setFilter] = useState("followers"); // State to track the filter option
     const bgColor = useColorModeValue("gray.100", "gray.900");
