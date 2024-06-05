@@ -48,7 +48,7 @@ const ChatApp = () => {
       <ChatPanel />
 
       {/* Header */}
-      <Box width={{ base: '100%', md: '70%' }} border="1px" borderRadius="md" borderTopLeftRadius={0} borderBottomLeftRadius={0} overflow="hidden">
+      <Box width={{ base: '100%', md: '70%' }}  borderRadius="md" borderTopLeftRadius={0} borderBottomLeftRadius={0} overflow="hidden">
 
         <ChatHeader />
 
