@@ -4,6 +4,7 @@ import { useChats } from '../context/ChatsContext';
 import { FaEllipsisH, FaPhone, FaVideo } from 'react-icons/fa';
 import { useCall } from '../context/CallContext';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { formatLastSeen } from '../services/timeConvert';
 
 const ChatHeader = () => {
     const {isOnline, isTyping, typingUser, selectedUser, setIsUserListOpen, isUserListOpen, isMobile } = useChats();
@@ -39,7 +40,7 @@ const ChatHeader = () => {
                         </Text>
                     ) : (
                         selectedUser && <Text fontWeight="bold" fontSize={'small'} color={isOnline?.includes(selectedUser?.username)? 'green.500' : 'green.400'}>
-                            {isOnline?.includes(selectedUser?.username) ? 'online' :'last seen at '+ selectedUser?.lastSeen}
+                            {isOnline?.includes(selectedUser?.username) ? 'online' :formatLastSeen(selectedUser?.lastSeen)}
                         </Text>
                     )}
                 </Box>

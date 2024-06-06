@@ -30,7 +30,32 @@ function calculateTimeDifference(createdAt) {
       } ago`;
     }
   }
+  function formatLastSeen(lastSeenTimestamp) {
+    const lastSeenDate = new Date(lastSeenTimestamp);
+    const now = new Date();
+  
+    const diffTime = now - lastSeenDate;
+    const diffHours = diffTime / (1000 * 60 * 60);
+  
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+  
+    if (diffHours < 24 && now.getDate() === lastSeenDate.getDate()) {
+      // Last seen today
+      return `Last seen at ${lastSeenDate.toLocaleString('en-US', options)}`;
+    } else if (diffHours < 48 && now.getDate() - lastSeenDate.getDate() === 1) {
+      // Last seen yesterday
+      return 'Last seen yesterday';
+    } else {
+      // Last seen more than 48 hours ago
+      return `Last seen on ${lastSeenDate.getDate()}/${lastSeenDate.getMonth() + 1}/${lastSeenDate.getFullYear()}`;
+    }
+  }
 
   module.exports ={
-    calculateTimeDifference
+    calculateTimeDifference,
+    formatLastSeen
   }
