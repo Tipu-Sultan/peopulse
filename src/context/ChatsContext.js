@@ -11,6 +11,7 @@ export const ChatsProvider = ({ children }) => {
     const isLogin = localStorage.getItem("userData");
     const isUser = isLogin ? JSON.parse(isLogin) : null;
     const [messages, setMessages] = useState([])
+    const [filteredMessages, setFilteredMessages] = useState([]);
     const [allmessages, setAllMessages] = useState([])
     const [userList, setUserList] = useState([])
     const [selectedUser, setSelectedUser] = useState(null);
@@ -23,9 +24,11 @@ export const ChatsProvider = ({ children }) => {
     const [isUserListOpen, setIsUserListOpen] = useState(false);
     const [messageText, setMessageText] = useState('')
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
+    const [searchTextInput,setSearchTextInput] = useState('');
     const getOnlineUsers = localStorage.getItem("onlineUsers");
     const isOnline = getOnlineUsers ? JSON.parse(getOnlineUsers) : null;
+    const [selectMsgDelete,setSelectMsgDelete] = useState(false);
+    const [selectedMessages, setSelectedMessages] = useState([]);
 
     const handleSendMessage = async (messageText, receiverUsername) => {
         try {
@@ -121,6 +124,36 @@ export const ChatsProvider = ({ children }) => {
         }
     };
 
+    const deleteMultipleMessages = async (selectedMessages) => {
+        try {
+          // Retrieve token from localStorage
+          const token = localStorage.getItem('token');
+      
+          // Set authorization header with the token
+          const headers = {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          };
+      
+          // Make the API request with the selectedMessages array and authorization headers
+          await axios.delete(`${API_HOST}/api/chats/delete-multi-messages`, {
+            headers,
+            data: { selectedMessages,username:isUser?.username  },
+          });
+      
+          const updatedMessages = filteredMessages?.filter(
+            message => !selectedMessages.some(selected => selected.messageId === message._id)
+        );
+        setMessages(updatedMessages)
+        socket.emit("deletedMultiMessage", { roomId:selectedUser?.username, updatedMessages });
+        setSelectedMessages([]);
+        setSelectMsgDelete(false)
+        } catch (error) {
+          console.error('Error deleting messages:', error); // Handle error
+        }
+      };
+      
+
     function dowloadMessageFile(filepath) {
         const downloadLink = document.createElement('a');
         downloadLink.href = API_HOST + '/' + filepath;
@@ -167,6 +200,24 @@ export const ChatsProvider = ({ children }) => {
         return unreadMessages?.length;
     }
 
+    const toggleMessageSelection = (messageId, senderUsername, receiverUsername) => {
+        const existingIndex = selectedMessages.findIndex(msg => msg.messageId === messageId);
+
+        if (existingIndex !== -1) {
+            // If the message is already selected, remove it from the selectedMessages array
+            setSelectedMessages(prevSelectedMessages => {
+                const updatedMessages = [...prevSelectedMessages];
+                updatedMessages.splice(existingIndex, 1);
+                return updatedMessages;
+            });
+        } else {
+            // If the message is not selected, add it to the selectedMessages array
+            setSelectedMessages(prevSelectedMessages => [
+                ...prevSelectedMessages,
+                { messageId, senderUsername, receiverUsername }
+            ]);
+        }
+    };
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -218,14 +269,38 @@ export const ChatsProvider = ({ children }) => {
             setMessages(updatedMessages);
         });
 
+        socket?.on('deletedMultiMessage', (updatedMessages) => {
+            setMessages(updatedMessages);
+        });
+
         // Clean up event listeners on component unmount
         return () => {
             socket?.off('message');
             socket?.off('isTyping');
             socket?.off('deletedMessage');
+            socket?.off('deletedMultiMessage');
+
         };
     }, [messages]);
 
+    useEffect(() => {
+        const filtered = searchMessages(messages, searchTextInput);
+        setFilteredMessages(filtered);
+      }, [messages, searchTextInput]);
+    
+      const searchMessages = (messages, searchTextInput) => {
+        if (!messages) return [];
+    
+        return messages.filter(message => {
+            const isDeletedForReceiver = message.isMsgDelete && message.receiverUsername === isUser.username;
+            const isVisibleToSender = message.senderUsername === isUser.username;
+            const matchesSearchText = !searchTextInput || message.message.toLowerCase().includes(searchTextInput.toLowerCase());
+    
+            return !isDeletedForReceiver && (isVisibleToSender || !message.isMsgDelete) && matchesSearchText;
+        });
+    };
+    
+      
 
 
     return (
@@ -262,7 +337,16 @@ export const ChatsProvider = ({ children }) => {
                 messageText,
                 setMessageText,
                 isOnline,
-                getUnreadMsgCount
+                getUnreadMsgCount,
+                searchTextInput,
+                setSearchTextInput,
+                filteredMessages,
+                selectMsgDelete,
+                setSelectMsgDelete,
+                selectedMessages,
+                setSelectedMessages,
+                deleteMultipleMessages,
+                toggleMessageSelection
             }}
         >
             {children}

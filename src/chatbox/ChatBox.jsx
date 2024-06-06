@@ -1,16 +1,16 @@
-import { Box, Button, Flex, IconButton, Image, Text } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import { Box, Button, Flex, IconButton, Image, Text, VStack } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
 import { FaFileDownload, FaTrash } from 'react-icons/fa';
 import { useChats } from '../context/ChatsContext';
-import { calculateTimeDifference } from '../services/timeConvert';
+import { formatChatTimestamp } from '../services/timeConvert';
 import Lottie from 'react-lottie';
 import animationData from '../assets/typing.json';
 
 const ChatBox = () => {
     const {
-        dowloadMessageFile, editableMessageId, isUser, messages,
+        dowloadMessageFile, editableMessageId, isUser, filteredMessages,
         handleDeleteMessage, chatboxRef, API_HOST, setEditableMessageId,
-        isTyping, typingUser, selectedUser
+        selectedUser, searchTextInput, selectMsgDelete, selectedMessages,toggleMessageSelection
     } = useChats();
 
     const [lastTap, setLastTap] = useState(0);
@@ -51,9 +51,15 @@ const ChatBox = () => {
         }
     };
 
+    useEffect(() => {
+        if (chatboxRef.current) {
+          chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
+        }
+      }, [chatboxRef, filteredMessages]);
+
     return (
         <Box p="4" flex="1" overflowY="scroll" ref={chatboxRef} position="relative">
-            {messages.map((message) => (
+            {selectedUser ? (filteredMessages.length > 0 ? (filteredMessages.map((message) => (
                 <Flex
                     key={message._id}
                     mb="3"
@@ -67,6 +73,16 @@ const ChatBox = () => {
                     onDoubleClick={() => handleDoubleClick(message._id)}
                     onClick={() => handleTap(message._id)}
                 >
+                    {selectMsgDelete && (
+                        <Box position="absolute" top="10px" right={message.senderUsername === isUser.username ? '5px' : ''}>
+                            <input
+                                type="checkbox"
+                                checked={selectedMessages && selectedMessages.some(msg => msg.messageId === message._id)}
+                                onChange={() => toggleMessageSelection(message._id, message.senderUsername, message.receiverUsername)}
+                            />
+
+                        </Box>
+                    )}
                     <Box
                         maxWidth="80%"
                         bg={message.senderUsername === isUser.username ? 'blue.400' : 'gray.200'}
@@ -106,7 +122,7 @@ const ChatBox = () => {
                             </>
                         ) : null}
                         <Text fontSize="xs" color={message.senderUsername === isUser.username ? 'white' : 'black'} textAlign="right">
-                            {calculateTimeDifference(message.timestamp)}
+                            {formatChatTimestamp(message.timestamp)}
                         </Text>
                     </Box>
 
@@ -137,21 +153,20 @@ const ChatBox = () => {
                         </Box>
                     )}
                 </Flex>
-            ))}
-            {selectedUser && isTyping && typingUser &&
-                <Flex
-                    position="absolute"
-                    bottom="10px"
-                    left="10px"
-                    alignItems="center"
-                >
-                    <Lottie
-                        width={70}
-                        options={defaultOptions}
-                        style={{ marginBottom: 15 }}
-                    />
+            ))) : (
+                searchTextInput && <Flex align="center" justify="center" h="100%">
+                    <Text>No chats found with the search "{searchTextInput}".</Text>
                 </Flex>
-            }
+            )
+            ) : (
+                <Flex align="center" justify="center" h="100%">
+                    <VStack>
+                        <Image src="https://peopulse.vercel.app/static/media/peopulse.11f71b903ae566685966.png" alt="Start Chat" w="200px" h="auto" />
+                        <Text fontSize="lg">Start chats with friends</Text>
+                    </VStack>
+                </Flex>
+            )}
+
         </Box>
     );
 }

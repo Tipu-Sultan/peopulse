@@ -1,15 +1,31 @@
-import { Avatar, Box, Flex, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, Text, useColorModeValue } from '@chakra-ui/react';
-import React from 'react';
+import {
+    Avatar,
+    Box,
+    CloseButton,
+    Flex,
+    Icon,
+    IconButton,
+    Input,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
+    Text,
+    useColorModeValue
+} from '@chakra-ui/react';
+import React, { useState } from 'react';
 import { useChats } from '../context/ChatsContext';
-import { FaEllipsisH, FaPhone, FaVideo } from 'react-icons/fa';
+import { FaEllipsisH, FaPhone, FaTrash, FaVideo } from 'react-icons/fa';
 import { useCall } from '../context/CallContext';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { formatLastSeen } from '../services/timeConvert';
 
 const ChatHeader = () => {
-    const {isOnline, isTyping, typingUser, selectedUser, setIsUserListOpen, isUserListOpen, isMobile } = useChats();
+    const {deleteMultipleMessages, selectedMessages,setSelectedMessages, selectMsgDelete, setSelectMsgDelete, isOnline, isTyping, typingUser, selectedUser, setIsUserListOpen, isUserListOpen, isMobile, searchTextInput, setSearchTextInput } = useChats();
     const { handleCallClick } = useCall();
     const bgColor = useColorModeValue('gray.100', 'gray.700');
+    const [searchInput, setSearchInput] = useState(false);
+
     return (
         <Flex
             align="center"
@@ -19,7 +35,7 @@ const ChatHeader = () => {
             borderBottom="1px"
             borderColor="gray.300"
         >
-            <Flex align="center">
+            <Flex align="center" flex="1">
                 {isMobile && (
                     <IconButton
                         icon={<HamburgerIcon />}
@@ -28,19 +44,19 @@ const ChatHeader = () => {
                         mr="2"
                     />
                 )}
-                <Avatar size="md" src={selectedUser && selectedUser?.profileImage} mr="2" />
+                <Avatar size="md" src={selectedUser?.profileImage} mr="2" />
 
-                <Box mr="2">
+                <Box flex="1" mr="2">
                     <Text fontWeight="bold">
-                        {selectedUser && selectedUser?.firstname + ' ' + selectedUser?.lastname}
+                        {selectedUser?.firstname} {selectedUser?.lastname}
                     </Text>
-                    {selectedUser && (isTyping && typingUser) ? (
+                    {isTyping && typingUser ? (
                         <Text fontWeight="bold" color="green.500">
                             Typing...
                         </Text>
-                    ) : (
-                        selectedUser && <Text fontWeight="bold" fontSize={'small'} color={isOnline?.includes(selectedUser?.username)? 'green.500' : 'green.400'}>
-                            {isOnline?.includes(selectedUser?.username) ? 'online' :formatLastSeen(selectedUser?.lastSeen)}
+                    ) : selectedUser && (
+                        <Text fontWeight="bold" fontSize={'small'} color={isOnline?.includes(selectedUser?.username) ? 'green.500' : 'green.400'}>
+                            {isOnline?.includes(selectedUser?.username) ? 'online' : formatLastSeen(selectedUser?.lastSeen)}
                         </Text>
                     )}
                 </Box>
@@ -60,12 +76,44 @@ const ChatHeader = () => {
                         />
                     </>
                 )}
+                {searchInput && (
+                    <Flex align="center" ml="4" borderRadius="lg" p="1">
+                        <Input
+                            placeholder="Search..."
+                            size="sm"
+                            autoFocus
+                            mr="2"
+                            value={searchTextInput}
+                            onInput={(e) => setSearchTextInput(e.target.value)}
+                        />
+                        <CloseButton size="sm" onClick={() => setSearchInput(false)} />
+                    </Flex>
+                )}
+                {selectMsgDelete && (
+                    <Flex align="center" ml="4" borderRadius="lg" p="1">
+                        <CloseButton size="sm" onClick={() => {setSelectMsgDelete(false);setSelectedMessages([]);}} />
+                    </Flex>
+                )}
+
+                {selectMsgDelete && selectedMessages.length > 0 && (
+                    <Flex align="center" ml="4" borderRadius="lg" p="1">
+                        <IconButton
+                            aria-label="Delete selected messages"
+                            icon={<FaTrash />}
+                            colorScheme="red"
+                            size="sm"
+                            onClick={() => deleteMultipleMessages(selectedMessages)}
+                        />
+                    </Flex>
+                )}
             </Flex>
             <Menu>
-                <MenuButton as={IconButton} icon={<Icon as={FaEllipsisH} title="Show more" />} />
+                <MenuButton ml="4" as={IconButton} icon={<Icon as={FaEllipsisH} title="Show more" />} />
                 <MenuList>
                     <MenuItem>Block</MenuItem>
                     <MenuItem>Clear chats</MenuItem>
+                    <MenuItem onClick={() => setSearchInput(true)}>Search chats</MenuItem>
+                    <MenuItem onClick={() => setSelectMsgDelete(true)}>Select chats</MenuItem>
                 </MenuList>
             </Menu>
         </Flex>

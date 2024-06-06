@@ -55,8 +55,8 @@ const ChatInput = () => {
             <IconButton
                 icon={<FaPaperclip />}
                 aria-label="Attach file"
-                variant="outline"
-                size="md"
+                variant="ghost"
+                mt={1}
                 onClick={handleAttachFile}
             />
             {selectedFileName && (

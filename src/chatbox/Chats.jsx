@@ -15,7 +15,6 @@ const ChatApp = () => {
 
   const {
     setIsMobile,
-    chatboxRef,
     selectedFileName,
     selectedUser, isUser, messages,
     getFollowedUser,
@@ -32,13 +31,6 @@ const ChatApp = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  useEffect(() => {
-    if (chatboxRef.current) {
-      chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
-    }
-  }, [chatboxRef, messages]);
-
 
 
   return (
