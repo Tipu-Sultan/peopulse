@@ -57,6 +57,7 @@ import SearchBar from "./services/SearchBar";
 import PageNotFound from "./services/PageNotFound";
 import Reels from "./home/Reels";
 import Setting from "./home/Setting";
+import { useChats } from "./context/ChatsContext";
 
 
 const LinkItems = (isUser) => {
@@ -140,13 +141,7 @@ const NavItem = ({ icon, children, link, onClose, ...rest }) => {
 
 const MobileNav = ({ onOpen, logout, isUser, ...rest }) => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const [notificationCount, setNotificationCount] = useState(2);
-  const [notifications, setNotifications] = useState([
-    {msg:'notification1'},
-    {msg:'notification2'},
-    {msg:'notification3'},
-  ]);
-
+  const {getUnreadMsgCount} = useChats()
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -171,7 +166,26 @@ const MobileNav = ({ onOpen, logout, isUser, ...rest }) => {
         {isUser&&
           <IconButton
           aria-label="Toggle color mode"
-          icon={<ChatIcon />}
+          icon={
+            <>
+          <ChatIcon />
+          {getUnreadMsgCount() > 0 && (
+            <Box
+              position="absolute"
+              top="-1"
+              right="-1"
+              rounded="full"
+              bg="red.500"
+              color="white"
+              fontSize="xs"
+              px="2"
+              py="1"
+            >
+             {getUnreadMsgCount()}
+            </Box>
+          )}
+          </>
+        }
           as={Link}
           to={'/chat'}
         />
@@ -190,29 +204,10 @@ const MobileNav = ({ onOpen, logout, isUser, ...rest }) => {
           icon={
             <>
               <FiBell />
-              {notificationCount > 0 && (
-                <Box
-                  position="absolute"
-                  top="-1"
-                  right="-1"
-                  rounded="full"
-                  bg="red.500"
-                  color="white"
-                  fontSize="xs"
-                  px="2"
-                  py="1"
-                >
-                  {notificationCount}
-                </Box>
-              )}
             </>
           }
         />
-        <MenuList>
-          {notifications.map((notification, index) => (
-            <MenuItem key={index}>{notification.msg}</MenuItem>
-          ))}
-        </MenuList>
+        
       </Menu>
 
         <Flex alignItems={"center"}>

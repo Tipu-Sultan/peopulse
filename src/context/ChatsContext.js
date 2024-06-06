@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 const ChatsContext = createContext();
 
 export const ChatsProvider = ({ children }) => {
-    const {socket} = useAuth()
+    const { socket } = useAuth()
     const API_HOST = process.env.REACT_APP_API_HOST;
     const chatboxRef = useRef(null);
     const token = localStorage.getItem("token");
@@ -29,7 +29,7 @@ export const ChatsProvider = ({ children }) => {
 
     const handleSendMessage = async (messageText, receiverUsername) => {
         try {
-            if (!messageText.trim()&& !selectedFile) {
+            if (!messageText.trim() && !selectedFile) {
                 return;
             }
             const roomId = receiverUsername;
@@ -39,7 +39,7 @@ export const ChatsProvider = ({ children }) => {
             formData.append('receiverUsername', receiverUsername);
 
             // Add file to formData if selectedFile is present
-            if (messageText!=='') {
+            if (messageText !== '') {
                 formData.append('message', messageText);
             }
             if (selectedFile) {
@@ -67,7 +67,7 @@ export const ChatsProvider = ({ children }) => {
 
     const handleSendClick = () => {
         handleSendMessage(messageText, selectedUser && selectedUser.username);
-        setMessageText(''); 
+        setMessageText('');
     };
     const getFollowedUser = async () => {
         try {
@@ -133,51 +133,57 @@ export const ChatsProvider = ({ children }) => {
     }
 
     const checkTyping = () => {
-        socket.emit('privateTyping', {isTyping: true,TypingMsg: messageText, reciverUsername: selectedUser?.username,senderUsername: isUser?.username });
+        socket.emit('privateTyping', { isTyping: true, TypingMsg: messageText, reciverUsername: selectedUser?.username, senderUsername: isUser?.username });
     };
 
 
     const getLastMessage = (currentUser, otherUser) => {
         const userMessages = allmessages.filter(message =>
-          (message.senderUsername === currentUser && message.receiverUsername === otherUser) ||
-          (message.senderUsername === otherUser && message.receiverUsername === currentUser)
+            (message.senderUsername === currentUser && message.receiverUsername === otherUser) ||
+            (message.senderUsername === otherUser && message.receiverUsername === currentUser)
         );
-    
+
         const unreadMessages = userMessages.filter(message =>
-          message.receiverUsername === currentUser && !message.isRead
+            message.receiverUsername === currentUser && !message.isRead
         );
-    
+
         const unreadCount = unreadMessages.length;
-    
+
         if (userMessages.length > 0) {
-          const lastMessage = userMessages[userMessages.length - 1];
-          return {
-            message: lastMessage.message,
-            timestamp: lastMessage.timestamp,
-            isRead: lastMessage.isRead,
-            unreadCount: unreadCount
-          };
+            const lastMessage = userMessages[userMessages.length - 1];
+            return {
+                message: lastMessage.message,
+                timestamp: lastMessage.timestamp,
+                isRead: lastMessage.isRead,
+                unreadCount: unreadCount
+            };
         }
         return null;
-      };
+    };
+    const getUnreadMsgCount = () => {
+        const unreadMessages = allmessages?.filter(message =>
+            message?.receiverUsername === isUser?.username && !message.isRead
+        );
+        return unreadMessages?.length;
+    }
 
 
     useEffect(() => {
         const fetchMessages = async () => {
-          try {
-            const response = await axios.get(`${API_HOST}/api/chats/get-allmessages`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            setAllMessages(response.data);
-          } catch (error) {
-            console.error('Error fetching messages:', error);
-          }
+            try {
+                const response = await axios.get(`${API_HOST}/api/chats/get-allmessages`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setAllMessages(response.data);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
         };
-    
+
         fetchMessages();
-      }, [selectedUser]);
+    }, [selectedUser]);
 
     useEffect(() => {
         const typingTimeout = setTimeout(() => {
@@ -190,12 +196,12 @@ export const ChatsProvider = ({ children }) => {
     useEffect(() => {
         // Listen for new messages
         socket?.on('message', (savedMessage) => {
-            if(savedMessage.senderUsername === selectedUser.username) {
+            if (savedMessage.senderUsername === selectedUser.username) {
                 setMessages((prevMessages) => [...prevMessages, savedMessage]);
             }
         });
 
-        socket?.on('isTyping', ({ isTyping,TypingMsg, reciverUsername,senderUsername }) => {
+        socket?.on('isTyping', ({ isTyping, TypingMsg, reciverUsername, senderUsername }) => {
             if (isTyping && senderUsername === selectedUser.username) {
                 setIsTyping(isTyping);
                 setTypingUser(reciverUsername);
@@ -247,15 +253,16 @@ export const ChatsProvider = ({ children }) => {
                 getFollowedUser,
                 setMessages,
                 handleDeleteMessage,
-                isUserListOpen, 
+                isUserListOpen,
                 setIsUserListOpen,
                 getLastMessage,
                 handleSendClick,
-                isMobile, 
+                isMobile,
                 setIsMobile,
-                messageText, 
+                messageText,
                 setMessageText,
-                isOnline
+                isOnline,
+                getUnreadMsgCount
             }}
         >
             {children}
