@@ -1,6 +1,6 @@
 import { CloseIcon } from '@chakra-ui/icons';
-import { Button, Flex, IconButton, Input } from '@chakra-ui/react';
-import React from 'react'
+import { Button, Flex, IconButton, Textarea } from '@chakra-ui/react';
+import React from 'react';
 import { FaPaperclip, FaRegPaperPlane } from 'react-icons/fa';
 import { useChats } from '../context/ChatsContext';
 
@@ -13,6 +13,7 @@ const ChatInput = () => {
         selectedUser, handleSendMessage,
         messageText, setMessageText
     } = useChats();
+
     const handleAttachFile = () => {
         fileInputRef.current.click();
     };
@@ -24,27 +25,32 @@ const ChatInput = () => {
     };
 
     const handleClearFile = () => {
-        fileInputRef.current.value = ''; // Clear the file input
-        setSelectedFileName(null); // Reset selected filename
+        fileInputRef.current.value = ''; 
+        setSelectedFileName(null); 
     };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage(messageText, selectedUser && selectedUser.username);
+            setMessageText('');
+        }
+    };
+
     return (
         <Flex p="3">
-            <Input
+            <Textarea
                 placeholder="Type your message..."
                 variant="filled"
                 size="lg"
                 flex="1"
                 mr="2"
                 value={messageText}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleSendMessage(messageText, selectedUser && selectedUser.username);
-                        setMessageText('')
-                    }
-                }}
+                onKeyDown={handleKeyDown}
                 onChange={(e) => setMessageText(e.target.value)}
                 onInput={() => checkTyping()}
+                resize="none" 
+                whiteSpace="pre-wrap" 
             />
             <IconButton
                 mt={1}
@@ -71,7 +77,7 @@ const ChatInput = () => {
                 onChange={handleFileInputChange}
             />
         </Flex>
-    )
-}
+    );
+};
 
-export default ChatInput
+export default ChatInput;

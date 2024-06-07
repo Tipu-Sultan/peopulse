@@ -47,7 +47,7 @@ function formatLastSeen(lastSeenTimestamp) {
     return `Last seen at ${lastSeenDate.toLocaleString('en-US', options)}`;
   } else if (diffHours < 48 && now.getDate() - lastSeenDate.getDate() === 1) {
     // Last seen yesterday
-    return 'Last seen yesterday';
+    return `Last seen yesterday ${lastSeenDate.toLocaleString('en-US', options)}`;
   } else {
     // Last seen more than 48 hours ago
     return `Last seen on ${lastSeenDate.getDate()}/${lastSeenDate.getMonth() + 1}/${lastSeenDate.getFullYear()}`;

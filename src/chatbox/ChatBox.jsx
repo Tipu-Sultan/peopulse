@@ -10,7 +10,7 @@ const ChatBox = () => {
     const {
         dowloadMessageFile, editableMessageId, isUser, filteredMessages,
         handleDeleteMessage, chatboxRef, API_HOST, setEditableMessageId,
-        selectedUser, searchTextInput, selectMsgDelete, selectedMessages,toggleMessageSelection
+        selectedUser, searchTextInput, selectMsgDelete, selectedMessages, toggleMessageSelection
     } = useChats();
 
     const [lastTap, setLastTap] = useState(0);
@@ -53,111 +53,112 @@ const ChatBox = () => {
 
     useEffect(() => {
         if (chatboxRef.current) {
-          chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
+            chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
         }
-      }, [chatboxRef, filteredMessages]);
+    }, [chatboxRef, filteredMessages]);
 
     return (
         <Box p="4" flex="1" overflowY="scroll" ref={chatboxRef} position="relative">
-            {selectedUser ? (filteredMessages.length > 0 ? (filteredMessages.map((message) => (
-                <Flex
-                    key={message._id}
-                    mb="3"
-                    justifyContent={message.senderUsername === isUser.username ? 'flex-end' : 'flex-start'}
-                    alignItems="flex-end"
-                    style={{
-                        transform: editableMessageId === message._id ? `translateX(${message.senderUsername === isUser.username ? '-50px' : '50px'})` : 'none',
-                        transition: 'transform 0.3s ease-in-out',
-                        position: 'relative',
-                    }}
-                    onDoubleClick={() => handleDoubleClick(message._id)}
-                    onClick={() => handleTap(message._id)}
-                >
-                    {selectMsgDelete && (
-                        <Box position="absolute" top="10px" right={message.senderUsername === isUser.username ? '5px' : ''}>
-                            <input
-                                type="checkbox"
-                                checked={selectedMessages && selectedMessages.some(msg => msg.messageId === message._id)}
-                                onChange={() => toggleMessageSelection(message._id, message.senderUsername, message.receiverUsername)}
-                            />
-
-                        </Box>
-                    )}
-                    <Box
-                        maxWidth="80%"
-                        bg={message.senderUsername === isUser.username ? 'blue.400' : 'gray.200'}
-                        color={message.senderUsername === isUser.username ? 'white' : 'black'}
-                        p="3"
-                        borderRadius="md"
-                    >
-                        {message.contentType === 'text' ? (
-                            <Text>{message.message}</Text>
-                        ) : message.contentType === 'image' ? (
-                            <>
-                                <Image src={`${API_HOST}/${message.filepath}`} alt="Image" />
-                                {message.message && <Text>{message.message}</Text>}
-                            </>
-                        ) : message.contentType === 'video' ? (
-                            <>
-                                <video width="100%" controls>
-                                    <source src={`${API_HOST}/${message.filepath}`} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video>
-                                {message.message && <Text>{message.message}</Text>}
-                            </>
-                        ) : message.contentType === 'document' ? (
-                            <>
-                                <Text>{message.contentType}:</Text>
-                                <Button
-                                    as="a"
-                                    href={`${API_HOST}/${message.filepath}`}
-                                    target="_blank"
-                                    download
-                                    colorScheme="blue"
-                                    mt="2"
-                                >
-                                    <FaFileDownload />
-                                </Button>
-                                {message.message && <Text>{message.message}</Text>}
-                            </>
-                        ) : null}
-                        <Text fontSize="xs" color={message.senderUsername === isUser.username ? 'white' : 'black'} textAlign="right">
-                            {formatChatTimestamp(message.timestamp)}
-                        </Text>
-                    </Box>
-
-                    {/* Delete and Download button */}
-                    {editableMessageId === message._id && (
-                        <Box position="absolute" top="10px" right={message.senderUsername === isUser.username ? '5px' : ''}>
-                            <Flex align="center">
-                                {message.senderUsername === isUser.username && (
-                                    <IconButton
-                                        icon={<FaTrash />}
-                                        size="sm"
-                                        aria-label="Delete Message"
-                                        onClick={() => handleDeleteMessage(message._id, message.roomId)}
-                                        mr="2"
+            {selectedUser ? (
+                filteredMessages.length > 0 ? (
+                    filteredMessages.map((message) => (
+                        <Flex
+                            key={message._id}
+                            mb="3"
+                            justifyContent={message.senderUsername === isUser.username ? 'flex-end' : 'flex-start'}
+                            alignItems="flex-end"
+                            style={{
+                                transform: editableMessageId === message._id ? `translateX(${message.senderUsername === isUser.username ? '-50px' : '50px'})` : 'none',
+                                transition: 'transform 0.3s ease-in-out',
+                                position: 'relative',
+                            }}
+                            onDoubleClick={() => handleDoubleClick(message._id)}
+                            onClick={() => handleTap(message._id)}
+                        >
+                            {selectMsgDelete && (
+                                <Box position="absolute" top="10px" right={message.senderUsername === isUser.username ? '5px' : ''}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedMessages && selectedMessages.some(msg => msg.messageId === message._id)}
+                                        onChange={() => toggleMessageSelection(message._id, message.senderUsername, message.receiverUsername)}
                                     />
-                                )}
-                                {message.contentType !== 'text' && (
-                                    <IconButton
-                                        icon={<FaFileDownload />}
-                                        color={'black'}
-                                        size="sm"
-                                        aria-label="Download Message"
-                                        onClick={() => dowloadMessageFile(message.filepath)}
-                                        mr="2"
-                                    />
-                                )}
-                            </Flex>
-                        </Box>
-                    )}
-                </Flex>
-            ))) : (
-                searchTextInput && <Flex align="center" justify="center" h="100%">
-                    <Text>No chats found with the search "{searchTextInput}".</Text>
-                </Flex>
-            )
+                                </Box>
+                            )}
+                            <Box
+                                maxWidth="80%"
+                                bg={message.senderUsername === isUser.username ? 'blue.400' : 'gray.200'}
+                                color={message.senderUsername === isUser.username ? 'white' : 'black'}
+                                p="3"
+                                borderRadius="md"
+                            >
+                                {message.contentType === 'text' ? (
+                                    <Text whiteSpace="pre-wrap">{message.message}</Text>
+                                ) : message.contentType === 'image' ? (
+                                    <>
+                                        <Image src={`${API_HOST}/${message.filepath}`} alt="Image" />
+                                        {message.message && <Text whiteSpace="pre-wrap">{message.message}</Text>}
+                                    </>
+                                ) : message.contentType === 'video' ? (
+                                    <>
+                                        <video width="100%" controls>
+                                            <source src={`${API_HOST}/${message.filepath}`} type="video/mp4" />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        {message.message && <Text whiteSpace="pre-wrap">{message.message}</Text>}
+                                    </>
+                                ) : message.contentType === 'document' ? (
+                                    <>
+                                        <Text>{message.contentType}:</Text>
+                                        <Button
+                                            as="a"
+                                            href={`${API_HOST}/${message.filepath}`}
+                                            target="_blank"
+                                            download
+                                            colorScheme="blue"
+                                            mt="2"
+                                        >
+                                            <FaFileDownload />
+                                        </Button>
+                                        {message.message && <Text whiteSpace="pre-wrap">{message.message}</Text>}
+                                    </>
+                                ) : null}
+                                <Text fontSize="xs" color={message.senderUsername === isUser.username ? 'white' : 'black'} textAlign="right">
+                                    {formatChatTimestamp(message.timestamp)}
+                                </Text>
+                            </Box>
+
+                            {editableMessageId === message._id && (
+                                <Box position="absolute" top="10px" right={message.senderUsername === isUser.username ? '5px' : ''}>
+                                    <Flex align="center">
+                                        {message.senderUsername === isUser.username && (
+                                            <IconButton
+                                                icon={<FaTrash />}
+                                                size="sm"
+                                                aria-label="Delete Message"
+                                                onClick={() => handleDeleteMessage(message._id, message.roomId)}
+                                                mr="2"
+                                            />
+                                        )}
+                                        {message.contentType !== 'text' && (
+                                            <IconButton
+                                                icon={<FaFileDownload />}
+                                                color={'black'}
+                                                size="sm"
+                                                aria-label="Download Message"
+                                                onClick={() => dowloadMessageFile(message.filepath)}
+                                                mr="2"
+                                            />
+                                        )}
+                                    </Flex>
+                                </Box>
+                            )}
+                        </Flex>
+                    ))
+                ) : (
+                    searchTextInput && <Flex align="center" justify="center" h="100%">
+                        <Text>No chats found with the search "{searchTextInput}".</Text>
+                    </Flex>
+                )
             ) : (
                 <Flex align="center" justify="center" h="100%">
                     <VStack>
@@ -166,7 +167,6 @@ const ChatBox = () => {
                     </VStack>
                 </Flex>
             )}
-
         </Box>
     );
 }
