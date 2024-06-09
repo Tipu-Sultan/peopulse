@@ -6,7 +6,7 @@ import { formatChatTimestamp } from '../services/timeConvert';
 import Lottie from 'react-lottie';
 import animationData from '../assets/typing.json';
 
-const ChatBox = () => {
+const ChatBox = ({SelectedUsername}) => {
     const {
         dowloadMessageFile, editableMessageId, isUser, filteredMessages,
         handleDeleteMessage, chatboxRef, API_HOST, setEditableMessageId,
@@ -42,14 +42,7 @@ const ChatBox = () => {
         setLastTap(currentTime);
     };
 
-    const defaultOptions = {
-        loop: true,
-        autoplay: true,
-        animationData: animationData,
-        rendererSettings: {
-            preserveAspectRatio: 'xMidYMid slice'
-        }
-    };
+   
 
     useEffect(() => {
         if (chatboxRef.current) {
@@ -59,7 +52,7 @@ const ChatBox = () => {
 
     return (
         <Box p="4" flex="1" overflowY="scroll" ref={chatboxRef} position="relative">
-            {selectedUser ? (
+            {SelectedUsername || selectedUser ? (
                 filteredMessages.length > 0 ? (
                     filteredMessages.map((message) => (
                         <Flex
@@ -89,7 +82,7 @@ const ChatBox = () => {
                                 bg={message.senderUsername === isUser.username ? 'blue.400' : 'gray.200'}
                                 color={message.senderUsername === isUser.username ? 'white' : 'black'}
                                 p="3"
-                                borderRadius="md"
+                                style={message.senderUsername === isUser.username ?{borderRadius:'30px 0px 30px 30px'}:{borderRadius:'0px 30px 30px 30px'}}
                             >
                                 {message.contentType === 'text' ? (
                                     <Text whiteSpace="pre-wrap">{message.message}</Text>

@@ -21,7 +21,12 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import { formatLastSeen } from '../services/timeConvert';
 
 const ChatHeader = () => {
-    const {deleteMultipleMessages, selectedMessages,setSelectedMessages, selectMsgDelete, setSelectMsgDelete, isOnline, isTyping, typingUser, selectedUser, setIsUserListOpen, isUserListOpen, isMobile, searchTextInput, setSearchTextInput } = useChats();
+    const { isUser, updateBlockUnblock, deleteMultipleMessages,
+        selectedMessages, setSelectedMessages, selectMsgDelete,
+        setSelectMsgDelete, isOnline, isTyping, typingUser,
+        selectedUser, setIsUserListOpen, isUserListOpen,
+        isMobile, searchTextInput, setSearchTextInput } = useChats();
+    console.log(selectedUser)
     const { handleCallClick } = useCall();
     const bgColor = useColorModeValue('gray.100', 'gray.700');
     const [searchInput, setSearchInput] = useState(false);
@@ -77,7 +82,7 @@ const ChatHeader = () => {
                     </>
                 )}
                 {searchInput && (
-                    <Flex align="center" ml="4" borderRadius="lg" p="1">
+                    <Flex align="center" ml="4" borderRadius="md" p="1">
                         <Input
                             placeholder="Search..."
                             size="sm"
@@ -85,13 +90,14 @@ const ChatHeader = () => {
                             mr="2"
                             value={searchTextInput}
                             onInput={(e) => setSearchTextInput(e.target.value)}
+                            borderRadius={'md'}
                         />
                         <CloseButton size="sm" onClick={() => setSearchInput(false)} />
                     </Flex>
                 )}
                 {selectMsgDelete && (
                     <Flex align="center" ml="4" borderRadius="lg" p="1">
-                        <CloseButton size="sm" onClick={() => {setSelectMsgDelete(false);setSelectedMessages([]);}} />
+                        <CloseButton size="sm" onClick={() => { setSelectMsgDelete(false); setSelectedMessages([]); }} />
                     </Flex>
                 )}
 
@@ -110,7 +116,7 @@ const ChatHeader = () => {
             <Menu>
                 <MenuButton ml="4" as={IconButton} icon={<Icon as={FaEllipsisH} title="Show more" />} />
                 <MenuList>
-                    <MenuItem>Block</MenuItem>
+                    <MenuItem onClick={() => updateBlockUnblock(selectedUser?.username, selectedUser?.blockStatus)}>{selectedUser?.blockStatus || 'Block'}</MenuItem>
                     <MenuItem>Clear chats</MenuItem>
                     <MenuItem onClick={() => setSearchInput(true)}>Search chats</MenuItem>
                     <MenuItem onClick={() => setSelectMsgDelete(true)}>Select chats</MenuItem>

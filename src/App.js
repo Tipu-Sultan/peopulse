@@ -65,8 +65,8 @@ const LinkItems = (isUser) => {
     return [
       { name: "Home", icon: FiHome, link: "/", },
       { name: "Reels", icon: FiTrendingUp, link: "/reels" },
+      { name: "Add Friends", icon: FaUserFriends, link: "/add-friends" },
       { name: "Friends", icon: FaUserFriends, link: "/friends" },
-      { name: "Request", icon: FaUserFriends, link: "/request" },
       { name: "Favourites", icon: FiStar, link: "/favourites" },
       { name: "Settings", icon: FiSettings, link: "/settings" },
     ];
@@ -285,7 +285,7 @@ const SidebarWithHeader = () => {
 
       <MobileNav onOpen={onOpen} logout={logout}
         isUser={isUser} />
-      <Box ml={{ base: 0, md: 60 }} p="4" >
+      <Box ml={{ base: 0, md: 60 }} p="2" >
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -298,9 +298,11 @@ const SidebarWithHeader = () => {
               <Route path="/" element={<Home />} />
               <Route path="/reels" element={<Reels />} />
               <Route path="/chat" element={<Chats />} />
+              <Route path="/chat/:SelectedUsername" element={<Chats />} />
+
               <Route path="/profile/:username" element={<Profile />} />
-              <Route path="/friends" element={<Follow />} />
-              <Route path="/request" element={<Request />} />
+              <Route path="/add-friends" element={<Follow />} />
+              <Route path="/friends" element={<Request />} />
               <Route path="/settings" element={<Setting />} />
 
             </>

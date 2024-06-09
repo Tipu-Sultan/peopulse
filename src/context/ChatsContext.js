@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import { toast } from 'react-toastify';
 const ChatsContext = createContext();
 
 export const ChatsProvider = ({ children }) => {
@@ -24,11 +25,13 @@ export const ChatsProvider = ({ children }) => {
     const [isUserListOpen, setIsUserListOpen] = useState(false);
     const [messageText, setMessageText] = useState('')
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    const [searchTextInput,setSearchTextInput] = useState('');
+    const [searchTextInput, setSearchTextInput] = useState('');
     const getOnlineUsers = localStorage.getItem("onlineUsers");
     const isOnline = getOnlineUsers ? JSON.parse(getOnlineUsers) : null;
-    const [selectMsgDelete,setSelectMsgDelete] = useState(false);
+    const [selectMsgDelete, setSelectMsgDelete] = useState(false);
     const [selectedMessages, setSelectedMessages] = useState([]);
+    const [groupName, setGroupName] = useState('');
+    const [selectedMembers, setSelectedMembers] = useState([]);
 
     const handleSendMessage = async (messageText, receiverUsername) => {
         try {
@@ -104,8 +107,8 @@ export const ChatsProvider = ({ children }) => {
         }
     };
 
-    const handleUserClick = (user) => {
-        getAllSenderReciverMsg(isUser.username, user.username)
+    const handleUserClick = (user,receiverUsername) => {
+        getAllSenderReciverMsg(isUser.username, receiverUsername)
         setSelectedUser(user);
 
     };
@@ -126,33 +129,33 @@ export const ChatsProvider = ({ children }) => {
 
     const deleteMultipleMessages = async (selectedMessages) => {
         try {
-          // Retrieve token from localStorage
-          const token = localStorage.getItem('token');
-      
-          // Set authorization header with the token
-          const headers = {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          };
-      
-          // Make the API request with the selectedMessages array and authorization headers
-          await axios.delete(`${API_HOST}/api/chats/delete-multi-messages`, {
-            headers,
-            data: { selectedMessages,username:isUser?.username  },
-          });
-      
-          const updatedMessages = filteredMessages?.filter(
-            message => !selectedMessages.some(selected => selected.messageId === message._id)
-        );
-        setMessages(updatedMessages)
-        socket.emit("deletedMultiMessage", { roomId:selectedUser?.username, updatedMessages });
-        setSelectedMessages([]);
-        setSelectMsgDelete(false)
+            // Retrieve token from localStorage
+            const token = localStorage.getItem('token');
+
+            // Set authorization header with the token
+            const headers = {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            };
+
+            // Make the API request with the selectedMessages array and authorization headers
+            await axios.delete(`${API_HOST}/api/chats/delete-multi-messages`, {
+                headers,
+                data: { selectedMessages, username: isUser?.username },
+            });
+
+            const updatedMessages = filteredMessages?.filter(
+                message => !selectedMessages.some(selected => selected.messageId === message._id)
+            );
+            setMessages(updatedMessages)
+            socket.emit("deletedMultiMessage", { roomId: selectedUser?.username, updatedMessages });
+            setSelectedMessages([]);
+            setSelectMsgDelete(false)
         } catch (error) {
-          console.error('Error deleting messages:', error); // Handle error
+            console.error('Error deleting messages:', error); // Handle error
         }
-      };
-      
+    };
+
 
     function dowloadMessageFile(filepath) {
         const downloadLink = document.createElement('a');
@@ -219,6 +222,47 @@ export const ChatsProvider = ({ children }) => {
         }
     };
 
+    async function updateBlockUnblock(To, blockStatus) {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('Authentication token not found');
+          }
+
+          if(blockStatus==='block'){
+            blockStatus='unblock';
+          }else{
+            blockStatus='block';
+          }
+      
+          // Construct the request body
+          const requestBody = {
+            To: To,
+            blockStatus: blockStatus
+          };
+      
+          // Make the API request
+          const response = await fetch(`${API_HOST}/api/follow/update-block-unbock`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify(requestBody)
+          });
+      
+          // Check if the request was successful
+          if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(`Failed to update block status: ${errorMessage}`);
+          }
+          toast.success('Block status updated successfully:');
+        } catch (error) {
+          console.error('Error updating block status:', error.message);
+          // Handle errors, e.g., show an error message to the user
+        }
+      }
+
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -235,6 +279,7 @@ export const ChatsProvider = ({ children }) => {
 
         fetchMessages();
     }, [selectedUser]);
+
 
     useEffect(() => {
         const typingTimeout = setTimeout(() => {
@@ -286,21 +331,21 @@ export const ChatsProvider = ({ children }) => {
     useEffect(() => {
         const filtered = searchMessages(messages, searchTextInput);
         setFilteredMessages(filtered);
-      }, [messages, searchTextInput]);
-    
-      const searchMessages = (messages, searchTextInput) => {
+    }, [messages, searchTextInput]);
+
+    const searchMessages = (messages, searchTextInput) => {
         if (!messages) return [];
-    
+
         return messages.filter(message => {
             const isDeletedForReceiver = message.isMsgDelete && message.receiverUsername === isUser.username;
             const isVisibleToSender = message.senderUsername === isUser.username;
             const matchesSearchText = !searchTextInput || message.message.toLowerCase().includes(searchTextInput.toLowerCase());
-    
+
             return !isDeletedForReceiver && (isVisibleToSender || !message.isMsgDelete) && matchesSearchText;
         });
     };
-    
-      
+
+
 
 
     return (
@@ -346,7 +391,13 @@ export const ChatsProvider = ({ children }) => {
                 selectedMessages,
                 setSelectedMessages,
                 deleteMultipleMessages,
-                toggleMessageSelection
+                toggleMessageSelection,
+                groupName,
+                setGroupName,
+                selectedMembers,
+                setSelectedMembers,
+                getAllSenderReciverMsg,
+                updateBlockUnblock
             }}
         >
             {children}

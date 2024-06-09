@@ -69,6 +69,7 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
       }
 
       // Append other fields to formData if needed
+      formData.append('loggedUsername', isUser?.username);
       formData.append('username', editedUser.username);
       formData.append('firstname', editedUser.firstname);
       formData.append('lastname', editedUser.lastname);

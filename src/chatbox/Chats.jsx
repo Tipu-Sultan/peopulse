@@ -10,14 +10,16 @@ import ChatPanel from './ChatPanel';
 import ChatHeader from './ChatHeader';
 import ChatBox from './ChatBox';
 import ChatInput from './ChatInput';
+import { useParams } from 'react-router-dom';
 const ChatApp = () => {
-
-
+  const { SelectedUsername } = useParams();
   const {
     setIsMobile,
     selectedFileName,
-    selectedUser, isUser, messages,
+    selectedUser, isUser,
     getFollowedUser,
+    handleUserClick
+    , userList
   } = useChats();
   const { isOpen, onClose } = useCall();
 
@@ -31,6 +33,14 @@ const ChatApp = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    const selectedUser = userList.find(user => user.username === SelectedUsername);
+    // Call handleUserClick with the selected user
+    if (selectedUser) {
+      handleUserClick(selectedUser, SelectedUsername);
+    }
+  }, [SelectedUsername, userList]);
 
 
   return (

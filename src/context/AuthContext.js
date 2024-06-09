@@ -1,13 +1,16 @@
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
+import { setOnlineUser } from '../redux/onlineUserSlice';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const API_HOST = process.env.REACT_APP_API_HOST;
   const isLogin = localStorage.getItem("userData");
   const isUser = isLogin ? JSON.parse(isLogin) : null;
@@ -42,6 +45,7 @@ export const AuthProvider = ({ children }) => {
       setSocket(socket);
       socket?.on('getOnlineUsers', (onlineUser) => {
         setOnlineUsers(onlineUser);
+        dispatch(setOnlineUser(onlineUser))
         localStorage.setItem('onlineUsers', JSON.stringify(onlineUser));
 
       })
