@@ -1,12 +1,9 @@
 import {
-    Avatar, Badge, Box, CloseButton, Flex, Input, IconButton, List, ListItem, Text, VStack, useColorModeValue,
-    useDisclosure
+    Avatar, Badge, Box, CloseButton, Flex, Input, List, ListItem, Text, VStack, useColorModeValue,
 } from '@chakra-ui/react';
-import { AddIcon } from '@chakra-ui/icons';
 import React, { useState } from 'react';
 import { calculateTimeDifference } from '../services/timeConvert';
 import { useChats } from '../context/ChatsContext';
-import CreateGroupModal from '../ui-modals/CreateGroupModal';
 import { Link } from 'react-router-dom';
 
 const ChatPanel = () => {
@@ -18,19 +15,17 @@ const ChatPanel = () => {
     const bgColor = useColorModeValue('gray.100', 'gray.700');
 
     const filteredUserList = userList
-        // Sort the user list based on the latest chat or activity
-        .sort((userA, userB) => {
-            const lastMessageA = getLastMessage(isUser.username, userA.username);
-            const lastMessageB = getLastMessage(isUser.username, userB.username);
-            if (!lastMessageA && !lastMessageB) return 0;
-            if (!lastMessageA) return 1;
-            if (!lastMessageB) return -1;
-            return lastMessageB.timestamp - lastMessageA.timestamp;
-        })
-        // Filter the sorted user list based on the search term
-        .filter(user =>
-            `${user.firstname} ${user.lastname}`.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    .sort((userA, userB) => {
+        const lastMessageA = new Date(getLastMessage(isUser.username, userA.username)?.timestamp);
+        const lastMessageB = new Date(getLastMessage(isUser.username, userB.username)?.timestamp);
+
+        // Sort users based on the timestamp of their last message
+        return lastMessageB - lastMessageA;
+    })
+    .filter(user =>
+        `${user.firstname} ${user.lastname}`.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
 
 
     return (
