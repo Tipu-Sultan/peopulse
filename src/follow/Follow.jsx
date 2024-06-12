@@ -81,7 +81,8 @@ export default function Follow() {
       templateColumns={{ base: "repeat(1, 1fr)", sm: "repeat(2, 1fr)", md: "repeat(4, 1fr)", lg: "repeat(5, 1fr)" }}
       gap={4}
     >
-      {users.map((user, i) => (
+      {users.filter(user => !(isFollowed(user.username, 'Following') || isFollowing(user.username, 'Following')))
+      .map((user, i) => (
         user.username !== isUser.username &&
         <GridItem key={user._id}>
           <Box

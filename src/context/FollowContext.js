@@ -42,7 +42,7 @@ export const FollowProvider = ({ children }) => {
     };
 
     fetchPosts();
-  }, []);
+  }, [API_HOST, token]);
 
   const handleFollow = async (username, action) => {
     try {
@@ -88,7 +88,6 @@ export const FollowProvider = ({ children }) => {
     }
   };
 
-
   useEffect(() => {
    
     socket?.on('follow-request', (followingbyreceiver, followedbySender, username, logginUser) => {
@@ -109,7 +108,7 @@ export const FollowProvider = ({ children }) => {
     return () => {
       socket?.off('follow-request');
     };
-  }, []);
+  }, [socket]);
 
 
   return (

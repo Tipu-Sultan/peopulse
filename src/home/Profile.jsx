@@ -17,7 +17,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { FaComment, FaThumbsUp, FaTrash } from 'react-icons/fa';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { DeleteUserModal } from '../ui-modals/DeleteModal';
 import UserEditModal from '../ui-modals/UserEditModal';
 import { usePost } from '../context/PostContext';
@@ -26,9 +26,9 @@ import { useFollow } from '../context/FollowContext';
 
 const Profile = () => {
   const API_HOST = process.env.REACT_APP_API_HOST;
-  const {setQuery} = useFollow()
+  const { setQuery } = useFollow()
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isUser, handleOpenModal,getUserByUsername,loadedUser } = useAuth();
+  const { isUser, handleOpenModal, getUserByUsername, loadedUser } = useAuth();
   const { posts, deleteAuthPost, RenderContent } = usePost();
   const { username } = useParams();
   useEffect(() => {
@@ -72,18 +72,22 @@ const Profile = () => {
           </Stack>
 
           <Stack direction={'row'} justify={'center'} spacing={6}>
-            <Stack spacing={0} align={'center'}>
-              <Text fontWeight={600}>{loadedUser.followers.length}</Text>
-              <Text fontSize={'sm'} color={'gray.500'}>
-                Followers
-              </Text>
-            </Stack>
-            <Stack spacing={0} align={'center'}>
-              <Text fontWeight={600}>{loadedUser.following.length}</Text>
-              <Text fontSize={'sm'} color={'gray.500'}>
-                Following
-              </Text>
-            </Stack>
+            <Link to={'/friends'}>
+              <Stack spacing={0} align={'center'}>
+                <Text fontWeight={600}>{loadedUser.followers.length}</Text>
+                <Text fontSize={'sm'} color={'gray.500'}>
+                  Followers
+                </Text>
+              </Stack>
+            </Link>
+            <Link to={'/friends'}>
+              <Stack spacing={0} align={'center'}>
+                <Text fontWeight={600}>{loadedUser.following.length}</Text>
+                <Text fontSize={'sm'} color={'gray.500'}>
+                  Following
+                </Text>
+              </Stack>
+            </Link>
           </Stack>
 
           <Text mt={4} bg={bgColor}>
@@ -156,8 +160,8 @@ const Profile = () => {
                         <FaComment /> {post.comments.length}
                       </Text>
                       {isCurrentUser && (
-                      <IconButton icon={<FaTrash/>} onClick={() => deleteAuthPost(post._id)}/>
-                    )}
+                        <IconButton icon={<FaTrash />} onClick={() => deleteAuthPost(post._id)} />
+                      )}
                     </HStack>
                   </Box>
                 </SimpleGrid>
