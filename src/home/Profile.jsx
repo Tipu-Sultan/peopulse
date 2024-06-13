@@ -90,9 +90,10 @@ const Profile = () => {
             </Link>
           </Stack>
 
-          <Text mt={4} bg={bgColor}>
-            {loadedUser.bio || 'No bio available.'}
-          </Text>
+          {
+            loadedUser.bio.split('\n').map((bio, index) => (
+              <Text key={index} mb="2">{bio}</Text>
+            ))}
 
           {isCurrentUser && (
             <HStack>
@@ -142,11 +143,11 @@ const Profile = () => {
               loadedUser._id === post.user && (
                 <SimpleGrid key={i} overflow={'hidden'} columns={1} spacing={4} borderWidth="1px" borderRadius="lg" p={4} boxShadow="md">
                   <Box>
-                    {RenderContent(post.contentType.split("/")[0], post.media)}
-
-                    <Heading size="sm" mb={2}>
-                      {post.content}
-                    </Heading>
+                    {RenderContent(
+                      post.contentType.split("/")[0],
+                      post.media,
+                      post.content
+                    )}
 
                     <Text color="gray.600" fontSize="sm" mb={4}>
                       {post.description}

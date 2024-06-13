@@ -26,7 +26,6 @@ const ChatHeader = () => {
         setSelectMsgDelete, isOnline, isTyping, typingUser,
         selectedUser, setIsUserListOpen, isUserListOpen,
         isMobile, searchTextInput, setSearchTextInput } = useChats();
-    console.log(selectedUser)
     const { handleCallClick } = useCall();
     const bgColor = useColorModeValue('gray.100', 'gray.700');
     const [searchInput, setSearchInput] = useState(false);
@@ -49,7 +48,7 @@ const ChatHeader = () => {
                         mr="2"
                     />
                 )}
-                <Avatar size="md" src={selectedUser?.profileImage} mr="2" />
+                <Avatar size="md" src={selectedUser?.profileImage} mr="2" borderRadius="full" border="2px solid" borderColor="gray.200" p="1" />
 
                 <Box flex="1" mr="2">
                     <Text fontWeight="bold">

@@ -23,7 +23,7 @@ import { usePost } from "../context/PostContext";
 
 
 const PostCard = () => {
-  const { posts, handleLike, deleteAuthPost, user, RenderContent, handleSharePost,EditPostByAuthUser } = usePost();
+  const { posts, handleLike, deleteAuthPost, user, RenderContent, handleSharePost, EditPostByAuthUser } = usePost();
   const [commentModalOpen, setCommentModalOpen] = useState(null)
 
   const filteredPosts = posts.filter(post => {
@@ -56,20 +56,12 @@ const PostCard = () => {
             <Flex justify="space-between" align="center">
               <HStack spacing="4" align="center" mb="2">
                 <Circle
-                  size={'45px'}
-                  borderColor={'#F56565'}
-                  borderWidth="2px"
+                  size={'50px'}
+                  bg="transparent"
+                  border="2px solid #fff"
                   cursor="pointer"
                   position="relative"
                 >
-                  <Circle
-                    size="60px"
-                    bg="transparent"
-                    border="1px solid"
-                    borderColor={'#fff'}
-                    position="absolute"
-                    zIndex="1"
-                  />
                   <Avatar
                     key={post._id}
                     size="md"
@@ -96,7 +88,7 @@ const PostCard = () => {
                   <MenuList>
                     {user._id === post.user && <MenuItem onClick={() => deleteAuthPost(post._id)}>Delete post</MenuItem>}
                     <MenuItem>Report</MenuItem>
-                    {user._id === post.user && <MenuItem onClick={()=>EditPostByAuthUser(post)}>Edit</MenuItem>}
+                    {user._id === post.user && <MenuItem onClick={() => EditPostByAuthUser(post)}>Edit</MenuItem>}
                   </MenuList>
                 </Menu>
                 <CloseButton title="Not intrested" />

@@ -133,7 +133,7 @@ export const PostProvider = ({ children }) => {
         const postIndex = posts.findIndex((post) => post._id === postId);
         const commentData = response.data.commentPost.comments
         socket.emit('addComment', postIndex, commentData);
-        setCommentText(' ')
+        setCommentText('');
       } else {
         console.error('Failed to add comment');
       }
@@ -259,7 +259,11 @@ export const PostProvider = ({ children }) => {
             </>
         );
     } else if (contentType === "text") {
-        return <Text mb="4">{content}</Text>;
+        // Split content by new lines and map each line to a separate <Text> element
+        const lines = content.split('\n').map((line, index) => (
+          <Text key={index} mb="2">{line}</Text>
+      ));
+      return <>{lines}</>;
     } else {
         return <Text mb="4">Unsupported content type</Text>;
     }

@@ -5,11 +5,13 @@ import React, { useState } from 'react';
 import { calculateTimeDifference } from '../services/timeConvert';
 import { useChats } from '../context/ChatsContext';
 import { Link } from 'react-router-dom';
+import { useCall } from '../context/CallContext';
 
 const ChatPanel = () => {
     const {
         isOnline, getLastMessage, isUserListOpen, setIsUserListOpen, userList, selectedUser, isUser, handleUserClick
     } = useChats();
+    const {callUser} = useCall();
 
     const [searchTerm, setSearchTerm] = useState('');
     const bgColor = useColorModeValue('gray.100', 'gray.700');
@@ -77,12 +79,14 @@ const ChatPanel = () => {
                             if (selectedUser?.username !== user.username) {
                                 handleUserClick(user,user?.username);
                                 setIsUserListOpen(false);
+                                callUser(selectedUser?.username)
                             }
                         }}
                     >
                         <Flex align="center" position="relative">
                             <Avatar
                                 size="md" src={user.profileImage} mr={2}
+                                borderRadius="full" border="2px solid" borderColor="gray.200" p="1"
                             />
                             <Box position="absolute" top="2" right="0">
                                 {isOnline?.includes(user?.username) ? (

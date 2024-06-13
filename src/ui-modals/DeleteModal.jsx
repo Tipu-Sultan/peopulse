@@ -51,7 +51,7 @@ return (
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Are you sure you want to delete This Account?
+            Are you sure you want to delete this Account?
           </Text>
         </ModalBody>
 

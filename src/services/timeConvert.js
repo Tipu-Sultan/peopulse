@@ -30,7 +30,15 @@ function calculateTimeDifference(createdAt) {
 }
 
 function formatLastSeen(lastSeenTimestamp) {
+  if (!lastSeenTimestamp) {
+    return 'Last seen unknown';
+  }
+
   const lastSeenDate = new Date(lastSeenTimestamp);
+  if (isNaN(lastSeenDate)) {
+    return 'Last seen unknown';
+  }
+
   const now = new Date();
 
   const diffTime = now - lastSeenDate;
@@ -39,7 +47,7 @@ function formatLastSeen(lastSeenTimestamp) {
   const options = {
     hour: 'numeric',
     minute: 'numeric',
-    hour12: true
+    hour12: true,
   };
 
   if (diffHours < 24 && now.getDate() === lastSeenDate.getDate()) {
@@ -47,46 +55,30 @@ function formatLastSeen(lastSeenTimestamp) {
     return `Last seen at ${lastSeenDate.toLocaleString('en-US', options)}`;
   } else if (diffHours < 48 && now.getDate() - lastSeenDate.getDate() === 1) {
     // Last seen yesterday
-    return `Last seen yesterday ${lastSeenDate.toLocaleString('en-US', options)}`;
+    return `Last seen yesterday at ${lastSeenDate.toLocaleString('en-US', options)}`;
   } else {
     // Last seen more than 48 hours ago
     return `Last seen on ${lastSeenDate.getDate()}/${lastSeenDate.getMonth() + 1}/${lastSeenDate.getFullYear()}`;
   }
 }
 
-function formatChatTimestamp(timestamp) {
+
+const formatChatTimestamp = (timestamp) => {
   const date = new Date(timestamp);
-  const now = new Date();
+  const options = { hour: 'numeric', minute: 'numeric' };
+  return date.toLocaleTimeString([], options);
+};
 
-  const options = {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  };
+const formatChatDate = (timestamp) => {
+  const date = new Date(timestamp);
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return date.toLocaleDateString(undefined, options);
+};
 
-  // Check if the timestamp is from today
-  if (now.toDateString() === date.toDateString()) {
-    return date.toLocaleString('en-US', options);
-  }
-
-  // Check if the timestamp is from yesterday
-  const yesterday = new Date();
-  yesterday.setDate(now.getDate() - 1);
-  if (yesterday.toDateString() === date.toDateString()) {
-    return `Yesterday at ${date.toLocaleString('en-US', options)}`;
-  }
-
-  // If the timestamp is older than yesterday, format it as dd/mm/yy at hh:mm:ss AM/PM
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-  const year = date.getFullYear().toString().slice(-2);
-  const time = date.toLocaleString('en-US', options);
-
-  return `${day}/${month}/${year} at ${time}`;
-}
 
 module.exports = {
   calculateTimeDifference,
   formatLastSeen,
-  formatChatTimestamp
+  formatChatTimestamp,
+  formatChatDate
 }

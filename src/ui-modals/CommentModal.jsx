@@ -34,7 +34,6 @@ const CommentModal = ({
     deleteComment,
     user,
   } = usePost();
-  const API_HOST = process.env.REACT_APP_API_HOST;
 
 
   return (
@@ -77,8 +76,9 @@ const CommentModal = ({
           <Input
             placeholder="Add a comment..."
             onChange={(e) => setCommentText(e.target.value)}
+            value={commentText}
           />
-          <Button isDisabled={commentText.length < 2} colorScheme="blue" onClick={() => addComment(postId)} ml={2}>
+          <Button isDisabled={commentText.length < 1} colorScheme="blue" onClick={() => addComment(postId)} ml={2}>
             Comment
           </Button>
         </ModalFooter>
